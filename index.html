@@ -3,27 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v7.0 - Universal AI</title>
+    <title>Jarvis v7.5 - Internet Master</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
         .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 95%; max-width: 600px; margin-top: 20px; }
         #output { margin-top: 20px; font-size: 1.1em; min-height: 280px; color: #fff; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.6; overflow-y: auto; max-height: 450px; }
-        .status-light { width: 12px; height: 12px; background: #f00; border-radius: 50%; display: inline-block; margin-right: 8px; }
         button { background: #0f0; color: #000; border: none; padding: 15px 35px; font-size: 1.1em; cursor: pointer; border-radius: 10px; font-weight: bold; box-shadow: 0 0 15px #0f0; margin-top: 20px; }
+        .status { color: #0f0; font-size: 0.8em; text-transform: uppercase; margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <h1 style="letter-spacing: 3px; margin: 10px;">JARVIS v7.0</h1>
-        <div><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
-        <div id="output">Jarvis: Taiyar hoon Sir. Puchiye duniya ki kisi bhi chiz ke bare mein.</div>
-        <button onclick="startJarvis()">INITIATE SCAN</button>
+        <div class="status" id="st">System: Online</div>
+        <h1 style="letter-spacing: 3px;">JARVIS v7.5</h1>
+        <div id="output">Jarvis: Taiyar hoon Sir. Duniya ki har jankari ab mere kabze mein hai.</div>
+        <button onclick="startJarvis()">MASTER SCAN</button>
     </div>
 
     <script>
         const output = document.getElementById('output');
-        const status = document.getElementById('status');
-        const light = document.getElementById('light');
+        const st = document.getElementById('st');
 
         function speak(text) {
             window.speechSynthesis.cancel();
@@ -31,51 +30,37 @@
             utterance.lang = 'hi-IN';
             window.speechSynthesis.speak(utterance);
             output.innerText = "Jarvis: " + text;
-            light.style.background = "#f00";
-            status.innerText = "System Standby";
+            st.innerText = "System: Standby";
         }
 
-        async function fetchGlobalKnowledge(query) {
-            status.innerText = "Searching Global Servers...";
-            light.style.background = "#ff0";
-            
-            // Special Auto-Correct for high priority topics
-            let searchQuery = query;
-            if(query.includes("stoke") || query.includes("stock")) searchQuery = "Stock market fundamentals";
-            if(query.includes("weapon") || query.includes("hathiyar")) searchQuery = "Advanced weaponry";
-
+        async function deepSearch(query) {
+            st.innerText = "Deep Scanning Internet...";
             try {
-                // English Search (Best for Tech/Finance/Weapons)
-                let res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchQuery)}`);
-                let data = await res.json();
+                // Pehle DuckDuckGo se pucho (Ye har chiz ka jawab deta hai)
+                let response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`);
+                let data = await response.json();
                 
-                if (data.extract) {
-                    return data.extract;
+                if (data.AbstractText) {
+                    return data.AbstractText;
                 } else {
-                    // Hindi Search (Best for History/Rules)
-                    let resHi = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
-                    let dataHi = await resHi.json();
-                    return dataHi.extract ? dataHi.extract : "Sir, mere 1000 saal ke database mein is topic par research abhi jaari hai.";
+                    // Agar wahan nahi mila toh Wikipedia backup
+                    let resWiki = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+                    let dataWiki = await resWiki.json();
+                    return dataWiki.extract ? dataWiki.extract : "Sir, is topic ki jankari bohot secret hai, lekin mere 1000 saal purane experience ke mutabik ye jald update hogi.";
                 }
             } catch (e) {
-                return "Sir, server se jankari nahi mil pa rahi hai.";
+                return "Connectivity issue, Sir.";
             }
         }
 
         function startJarvis() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'hi-IN';
-            
-            recognition.onstart = () => { 
-                status.innerText = "Listening to Command..."; 
-                light.style.background = "#0f0";
-            };
-
+            recognition.onstart = () => { st.innerText = "Listening..."; };
             recognition.onresult = async (event) => {
                 const transcript = event.results[0][0].transcript.toLowerCase();
                 output.innerText = "You: " + transcript;
-                
-                let result = await fetchGlobalKnowledge(transcript);
+                let result = await deepSearch(transcript);
                 speak(result);
             };
             recognition.start();
