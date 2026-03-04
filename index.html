@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis AI v3.0</title>
+    <title>Jarvis AI v3.1</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
         .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 90%; max-width: 500px; margin-top: 50px; }
-        #output { margin-top: 25px; font-size: 1.1em; min-height: 120px; color: #fff; overflow-y: auto; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.5; }
-        button { background: #0f0; color: #000; border: none; padding: 15px 40px; font-size: 1.2em; cursor: pointer; border-radius: 10px; font-weight: bold; margin-top: 25px; box-shadow: 0 0 15px #0f0; transition: 0.3s; }
+        #output { margin-top: 25px; font-size: 1.1em; min-height: 120px; color: #fff; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.5; }
+        button { background: #0f0; color: #000; border: none; padding: 15px 40px; font-size: 1.2em; cursor: pointer; border-radius: 10px; font-weight: bold; margin-top: 25px; box-shadow: 0 0 15px #0f0; }
         .status-light { width: 15px; height: 15px; background: #f00; border-radius: 50%; display: inline-block; margin-right: 10px; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <h1 style="letter-spacing: 5px;">JARVIS v3.0</h1>
+        <h1 style="letter-spacing: 5px;">JARVIS v3.1</h1>
         <div><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
         <div id="output">Jarvis: Taiyar hoon Sir.</div>
         <button onclick="startJarvis()">START JARVIS</button>
@@ -25,7 +25,7 @@
         const status = document.getElementById('status');
         const light = document.getElementById('light');
         
-        // Local Memory Load
+        // Memory Load
         let masterName = localStorage.getItem("masterName") || "Sir";
 
         function speak(message) {
@@ -60,28 +60,25 @@
             status.innerText = "Thinking...";
             let response = "";
 
-            // --- 1. MEMORY LOGIC (Pehle ye check hoga) ---
+            // 1. NAME STORAGE LOGIC (Strong Check)
             if (text.includes("mera naam") || text.includes("naam hai")) {
-                let name = text.replace("jarvis", "").replace("mera naam", "").replace("rakho", "").replace("hai", "").replace("naam hai", "").trim();
-                if(name) {
+                let name = text.replace("jarvis", "").replace("mera naam", "").replace("naam hai", "").replace("rakho", "").replace("hai", "").trim();
+                if(name.length > 0) {
                     localStorage.setItem("masterName", name);
                     masterName = name;
-                    response = "Theek hai " + masterName + ", maine aapka naam hamesha ke liye yaad kar liya hai.";
+                    response = "Theek hai " + masterName + ", maine aapka naam yaad kar liya hai. Ab boliye, main kya madad kar sakta hoon?";
                 } else {
                     response = "Aapka naam " + masterName + " hai.";
                 }
             } 
-            else if (text.includes("mera naam kya hai")) {
-                response = "Aapka naam " + masterName + " hai, aur hamara mission youngest billionaire banna hai.";
+            // 2. BILLIONAIRE GOAL LOGIC
+            else if (text.includes("billionaire") || text.includes("sapna") || text.includes("kaun hoon")) {
+                response = masterName + ", aap 15 saal ke hain aur aapka lakshya 19 se 20 saal ki umar mein billionaire banna hai.";
             }
-            // --- 2. GOAL LOGIC ---
-            else if (text.includes("billionaire") || text.includes("sapna") || text.includes("target")) {
-                response = masterName + ", aapka lakshya 19-20 saal ki umar mein billionaire banna hai. Main har pal saath hoon.";
-            }
-            // --- 3. HISTORY LOGIC (Agar upar kuch match nahi hua toh) ---
+            // 3. WIKIPEDIA HISTORY LOGIC (Only if above not matched)
             else {
                 let topic = text.replace("jarvis", "").replace("kaun hai", "").replace("batao", "").replace("kya hai", "").trim();
-                if(topic.length > 0) {
+                if(topic.length > 2) {
                     try {
                         let res = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
                         let data = await res.json();
@@ -93,8 +90,10 @@
                             response = dataEn.extract ? dataEn.extract : "Maaf kijiye " + masterName + ", iska koi record nahi mila.";
                         }
                     } catch (e) {
-                        response = "Sir, connection slow hai.";
+                        response = "Sir, connection issue hai.";
                     }
+                } else {
+                    response = "Bhai, main samajh nahi paya, ek baar phir boliye?";
                 }
             }
             speak(response);
