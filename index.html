@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis AI - History Edition</title>
+    <title>Jarvis AI - Billionaire Edition</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
         .jarvis-box { border: 2px solid #0f0; padding: 20px; border-radius: 15px; box-shadow: 0 0 20px #0f0; display: inline-block; width: 90%; max-width: 500px; }
@@ -14,9 +14,9 @@
 </head>
 <body>
     <div class="jarvis-box">
-        <h1>JARVIS v2.1</h1>
+        <h1>JARVIS v2.2</h1>
         <div><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
-        <div id="output">Bhai, main taiyar hoon. Mujhse kuch bhi poochiye.</div>
+        <div id="output">Sir, main taiyar hoon. Mujhse 1000 saal ki history ya kuch bhi poochiye.</div>
         <button onclick="startJarvis()">START JARVIS</button>
     </div>
 
@@ -48,22 +48,28 @@
             let response = "";
 
             if (text.includes("billionaire") || text.includes("ameer")) {
-                response = "Sir, aap 19 se 20 saal ki umar mein duniya ke youngest billionaire banenge. Ye mera vada hai!";
+                response = "Sir, aap 19 se 20 saal ki umar mein duniya ke youngest billionaire banenge. Main hamesha aapke saath hoon.";
             } else {
-                // Wikipedia Search Logic
-                let searchTopic = text.replace("jarvis", "").replace("batao", "").replace("kaun hai", "").replace("kaun tha", "").replace("kya hai", "").trim();
-                const url = `https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTopic)}`;
-                
-                try {
-                    const res = await fetch(url);
-                    const data = await res.json();
-                    if (data.extract) {
-                        response = data.extract;
-                    } else {
-                        response = "Bhai, mujhe '" + searchTopic + "' ke baare mein abhi jaankari nahi mili.";
+                // Smart Keyword Extraction
+                let searchTopic = text.replace("jarvis", "")
+                                     .replace("kya hai", "")
+                                     .replace("kaun hai", "")
+                                     .replace("kaun tha", "")
+                                     .replace("batao", "")
+                                     .replace("ke baare mein", "")
+                                     .trim();
+
+                if(searchTopic.length > 0) {
+                    const url = `https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTopic)}`;
+                    try {
+                        const res = await fetch(url);
+                        const data = await res.json();
+                        response = data.extract ? data.extract : "Bhai, '" + searchTopic + "' ke baare mein 1000 saal ke records mein kuch nahi mila.";
+                    } catch (e) {
+                        response = "Sir, internet slow hai, main dimaag nahi chala paa raha.";
                     }
-                } catch (e) {
-                    response = "Bhai, internet connection check karein, main dimaag nahi chala paa raha.";
+                } else {
+                    response = "Bhai, please topic ka naam lein taaki main search kar sakoon.";
                 }
             }
             speak(response);
