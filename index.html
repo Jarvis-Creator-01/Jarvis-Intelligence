@@ -6,7 +6,7 @@
     <title>Jarvis AI - World Mission</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
-        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 90%; max-width: 500px; }
+        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 90%; max-width: 500px; margin-top: 50px; }
         #output { margin-top: 25px; font-size: 1.1em; min-height: 120px; color: #fff; overflow-y: auto; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.5; }
         button { background: #0f0; color: #000; border: none; padding: 15px 40px; font-size: 1.2em; cursor: pointer; border-radius: 10px; font-weight: bold; margin-top: 25px; box-shadow: 0 0 15px #0f0; transition: 0.3s; }
         button:active { transform: scale(0.95); }
@@ -26,14 +26,13 @@
         const status = document.getElementById('status');
         const light = document.getElementById('light');
         
-        // Memory Load
         let masterName = localStorage.getItem("masterName") || "Sir";
 
         function speak(message) {
-            window.speechSynthesis.cancel(); // Purani awaaz band karne ke liye
+            window.speechSynthesis.cancel();
             const speech = new SpeechSynthesisUtterance(message);
             speech.lang = 'hi-IN';
-            speech.rate = 1.1; // Thodi fast speed
+            speech.rate = 1.1;
             window.speechSynthesis.speak(speech);
             output.innerText = "Jarvis: " + message;
             status.innerText = "System Standby";
@@ -67,46 +66,33 @@
             status.innerText = "Processing...";
             let response = "";
 
-            // 1. Memory: Naam Yaad Rakhna
             if (text.includes("mera naam") && (text.includes("rakho") || text.includes("hai"))) {
                 let name = text.replace("jarvis", "").replace("mera naam", "").replace("rakho", "").replace("hai", "").trim();
                 if(name) {
                     localStorage.setItem("masterName", name);
                     masterName = name;
-                    response = "Theek hai " + masterName + ", maine aapka naam hamesha ke liye yaad kar liya hai.";
-                } else {
-                    response = "Aapka naam " + masterName + " hai.";
+                    response = "Theek hai " + masterName + ", maine aapka naam yaad kar liya hai.";
                 }
             } 
-            // 2. Billionaire Goal Check
             else if (text.includes("billionaire") || text.includes("sapna") || text.includes("ameer")) {
-                response = masterName + ", aapka lakshya 19 se 20 saal ki umar mein duniya ka youngest billionaire banna hai. Main aapke saath hoon.";
+                response = masterName + ", aapka lakshya 19 se 20 saal ki umar mein billionaire banna hai.";
             }
-            // 3. Global History Search (Double Brain)
             else {
-                let topic = text.replace("jarvis", "").replace("kaun hai", "").replace("kaun tha", "").replace("kya hai", "").replace("batao", "").replace("about", "").trim();
-                
+                let topic = text.replace("jarvis", "").replace("kaun hai", "").replace("batao", "").trim();
                 if(topic.length > 0) {
-                    const hindiUrl = `https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
-                    const englishUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
-                    
                     try {
-                        let res = await fetch(hindiUrl);
+                        let res = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
                         let data = await res.json();
-                        
                         if (data.extract) {
                             response = data.extract;
                         } else {
-                            // Backup English Search
-                            let resEn = await fetch(englishUrl);
+                            let resEn = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
                             let dataEn = await resEn.json();
-                            response = dataEn.extract ? "Sir, English records ke mutabik: " + dataEn.extract : "Bhai, '" + topic + "' ke baare mein koi record nahi mila.";
+                            response = dataEn.extract ? dataEn.extract : "Mujhe iska record nahi mila.";
                         }
                     } catch (e) {
-                        response = "Sir, connection slow hai, main dimaag nahi chala paa raha.";
+                        response = "Internet issue hai sir.";
                     }
-                } else {
-                    response = "Bhai, please kisi topic ka naam lein.";
                 }
             }
             speak(response);
