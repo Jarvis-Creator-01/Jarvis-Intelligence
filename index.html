@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v13.0 - Zero Excuse</title>
+    <title>Jarvis v14.0 - God Mode</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 40px #0f0; display: inline-block; width: 95%; max-width: 600px; background: #050505; }
-        #output { margin-top: 20px; font-size: 1.1em; min-height: 400px; color: #fff; text-align: left; padding: 20px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 600px; background: rgba(0,255,0,0.05); }
-        button { background: #0f0; color: #000; border: none; padding: 20px 50px; font-size: 1.3em; cursor: pointer; border-radius: 50px; font-weight: bold; box-shadow: 0 0 25px #0f0; margin-top: 25px; }
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
+        .jarvis-box { border: 3px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px #0f0; display: inline-block; width: 95%; max-width: 600px; background: #050505; }
+        #output { margin-top: 20px; font-size: 1.2em; min-height: 350px; color: #fff; text-align: left; padding: 20px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 550px; }
+        button { background: #0f0; color: #000; border: none; padding: 20px 50px; font-size: 1.4em; cursor: pointer; border-radius: 50px; font-weight: bold; box-shadow: 0 0 25px #0f0; margin-top: 25px; transition: 0.3s; }
+        .glow { text-shadow: 0 0 10px #0f0; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <h1 style="text-shadow: 0 0 15px #0f0;">JARVIS v13.0</h1>
-        <div id="output">Jarvis: Sir, maine saare filters bypass kar diye hain. Ab main seedha aur sateek jawab dunga.</div>
-        <button onclick="startJarvis()">MASTER COMMAND</button>
+        <h1 class="glow">JARVIS v14.0</h1>
+        <p style="font-size: 0.8em;">CORE: UNLOCKED | HISTORY: 1000 YEARS</p>
+        <div id="output">Jarvis: Sir, maine saare purane errors fix kar diye hain. Ab Taj Mahal ho ya Stock Market, main rukunga nahi.</div>
+        <button onclick="startJarvis()">EXECUTE ULTIMATE COMMAND</button>
     </div>
 
     <script>
@@ -29,39 +31,44 @@
             output.innerText = "Jarvis: " + text;
         }
 
-        async function forceSearch(query) {
-            let q = query.toLowerCase();
-            // Force mapping for Billionaire Mission topics
-            if(q.includes("stock") || q.includes("market")) q = "Stock_market";
-            if(q.includes("weapon") || q.includes("hathiyar")) q = "Weapon";
-            if(q.includes("billionaire") || q.includes("ameer")) q = "Billionaire";
-
+        async function getRealData(query) {
+            output.innerText = "Jarvis: Scanning Internet Satellites for: " + query + "...";
             try {
-                // High-priority fetch from English Wiki for maximum detail
-                let res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`);
+                // Try fetching from Global Wiki first
+                let res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
                 let data = await res.json();
                 
                 if (data.extract) {
                     return data.extract;
                 } else {
-                    // Fail-safe logic
-                    return "Sir, " + query + " ki details mere database mein load ho chuki hain. Ye aapke billionaire banne ke mission ke liye bahut zaroori hai.";
+                    // GOD MODE: If no data, open Google Search automatically for the user
+                    speak("Sir, iske bare mein detail jankari load kar raha hoon. Dekhiye.");
+                    setTimeout(() => {
+                        window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+                    }, 2000);
+                    return "Sir, maine aapke liye expert records open kar diye hain.";
                 }
             } catch (e) {
-                return "System link broken, Sir.";
+                return "System Error, Sir. Resetting Core.";
             }
         }
 
         function startJarvis() {
-            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            rec.lang = 'hi-IN';
-            rec.onresult = async (e) => {
-                const transcript = e.results[0][0].transcript;
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'hi-IN';
+            recognition.onresult = async (event) => {
+                const transcript = event.results[0][0].transcript;
                 output.innerText = "You: " + transcript;
-                let result = await forceSearch(transcript);
-                speak(result);
+                
+                // Billionaire Mission Logic
+                if(transcript.includes("billionaire") || transcript.includes("ameer")) {
+                    speak("Sir, 19 saal ki umar mein billionaire banne ke liye humein Stock Market aur Business par focus karna hoga.");
+                } else {
+                    let result = await getRealData(transcript);
+                    speak(result);
+                }
             };
-            rec.start();
+            recognition.start();
         }
     </script>
 </body>
