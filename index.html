@@ -3,21 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis Intelligence</title>
+    <title>Jarvis AI - Billionaire Edition</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 50px; margin: 0; }
-        .container { border: 2px solid #0f0; padding: 20px; display: inline-block; border-radius: 10px; box-shadow: 0 0 15px #0f0; }
-        h1 { text-transform: uppercase; letter-spacing: 5px; }
-        .status { color: #fff; font-size: 1.2em; margin-top: 20px; }
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
+        .jarvis-box { border: 2px solid #0f0; padding: 20px; border-radius: 15px; box-shadow: 0 0 20px #0f0; display: inline-block; width: 90%; max-width: 500px; }
+        #output { margin-top: 20px; font-size: 1.2em; min-height: 50px; color: #fff; }
+        button { background: #0f0; color: #000; border: none; padding: 15px 30px; font-size: 1em; cursor: pointer; border-radius: 5px; font-weight: bold; margin-top: 20px; }
+        .status-light { width: 15px; height: 15px; background: #f00; border-radius: 50%; display: inline-block; margin-right: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Jarvis System Online</h1>
-        <p class="status">Initializing Neural Networks... <span class="blink">|</span></p>
-        <p>Target: Youngest Billionaire Empire</p>
+    <div class="jarvis-box">
+        <h1>JARVIS v1.0</h1>
+        <div id="status-container"><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
+        <div id="output">Bhai, main taiyar hoon. 'Start' button dabao aur mujhse baat karo.</div>
+        <button onclick="startJarvis()">START JARVIS</button>
     </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const light = document.getElementById('light');
+
+        function startJarvis() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'hi-IN'; // Aapki bhasha samajhne ke liye
+
+            recognition.onstart = () => {
+                status.innerText = "Listening...";
+                light.style.background = "#0f0";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                output.innerText = "You: " + transcript;
+                respond(transcript);
+            };
+
+            recognition.start();
+        }
+
+        function respond(text) {
+            let response = "Bhai, main abhi seekh raha hoon. Par aapka 100 Billion dollar ka sapna zaroor pura hoga!";
+            
+            if(text.includes("kaun ho")) {
+                response = "Main Jarvis hoon, aapka personal AI assistant. Hum milkar itihas banayenge.";
+            }
+
+            const speech = new SpeechSynthesisUtterance(response);
+            speech.lang = 'hi-IN';
+            window.speechSynthesis.speak(speech);
+            output.innerText = "Jarvis: " + response;
+            status.innerText = "System Standby";
+            light.style.background = "#f00";
+        }
+    </script>
 </body>
 </html>
