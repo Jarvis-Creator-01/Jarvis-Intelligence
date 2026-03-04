@@ -100,3 +100,44 @@
     </script>
 </body>
 </html>
+async function processQuery(text) {
+    status.innerText = "Processing...";
+    let response = "";
+
+    // 1. Agar user apna NAAM bata raha hai
+    if (text.includes("mera naam") || text.includes("naam hai")) {
+        // Naam nikalne ka logic
+        let name = text.replace("jarvis", "").replace("mera naam", "").replace("rakho", "").replace("hai", "").trim();
+        
+        if(name) {
+            localStorage.setItem("masterName", name);
+            masterName = name;
+            response = "Theek hai " + masterName + ", maine aapka naam yaad kar liya hai. Aapka lakshya youngest billionaire banna hai.";
+        }
+    } 
+    // 2. Agar user apna SAPNA/GOAL puch raha hai
+    else if (text.includes("billionaire") || text.includes("sapna") || text.includes("lakshya")) {
+        response = masterName + ", aapka sapna 19-20 saal ki umar mein billionaire banna hai. Main isme aapki madad karunga.";
+    }
+    // 3. Baaki sab HISTORY search (Wikipedia)
+    else {
+        let topic = text.replace("jarvis", "").replace("kaun hai", "").replace("batao", "").trim();
+        
+        if(topic.length > 0) {
+            try {
+                let res = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
+                let data = await res.json();
+                if (data.extract) {
+                    response = data.extract;
+                } else {
+                    let resEn = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
+                    let dataEn = await resEn.json();
+                    response = dataEn.extract ? dataEn.extract : "Bhai, iske baare mein 1000 saal ke records mein kuch nahi mila.";
+                }
+            } catch (e) {
+                response = "Sir, internet connectivity issue hai.";
+            }
+        }
+    }
+    speak(response);
+}
