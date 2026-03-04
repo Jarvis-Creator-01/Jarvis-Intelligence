@@ -3,92 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v4.0</title>
+    <title>Jarvis v6.0 - Universal Master</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
-        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 90%; max-width: 500px; margin-top: 50px; }
-        #output { margin-top: 25px; font-size: 1.1em; min-height: 120px; color: #fff; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.5; }
-        button { background: #0f0; color: #000; border: none; padding: 15px 40px; font-size: 1.2em; cursor: pointer; border-radius: 10px; font-weight: bold; margin-top: 25px; box-shadow: 0 0 15px #0f0; }
-        .status-light { width: 15px; height: 15px; background: #f00; border-radius: 50%; display: inline-block; margin-right: 10px; }
+        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 95%; max-width: 600px; margin-top: 30px; }
+        #output { margin-top: 25px; font-size: 1.1em; min-height: 250px; color: #fff; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.6; overflow-y: auto; max-height: 500px; white-space: pre-wrap; }
+        .status-bar { font-size: 0.9em; color: #0f0; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+        button { background: #0f0; color: #000; border: none; padding: 15px 30px; font-size: 1.1em; cursor: pointer; border-radius: 10px; font-weight: bold; box-shadow: 0 0 15px #0f0; margin-top: 20px; transition: 0.3s; }
+        button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <h1 style="letter-spacing: 5px;">JARVIS v4.0</h1>
-        <div><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
-        <div id="output">Jarvis: Main taiyar hoon Sir.</div>
-        <button onclick="startJarvis()">START JARVIS</button>
+        <div class="status-bar" id="status-text">Universal Brain: Online</div>
+        <h1 style="letter-spacing: 3px;">JARVIS GLOBAL v6.0</h1>
+        <div id="output">Jarvis: Main taiyar hoon Sir. Duniya ki har website, weapon, skill aur 1000 saal ki history mere access mein hai.</div>
+        <button onclick="startJarvis()">START SCANNING</button>
     </div>
 
     <script>
         const output = document.getElementById('output');
-        const status = document.getElementById('status');
-        const light = document.getElementById('light');
-        let masterName = localStorage.getItem("masterName") || "Sir";
+        const statusText = document.getElementById('status-text');
 
-        function speak(message) {
+        function speak(text) {
             window.speechSynthesis.cancel();
-            const speech = new SpeechSynthesisUtterance(message);
-            speech.lang = 'hi-IN';
-            window.speechSynthesis.speak(speech);
-            output.innerText = "Jarvis: " + message;
-            status.innerText = "System Standby";
-            light.style.background = "#f00";
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'hi-IN';
+            window.speechSynthesis.speak(utterance);
+            output.innerText = "Jarvis: " + text;
+            statusText.innerText = "Universal Brain: Standby";
+        }
+
+        async function getUniversalData(query) {
+            statusText.innerText = "Deep Scanning Knowledge Base...";
+            try {
+                // Pehle Hindi records check karega
+                let res = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+                let data = await res.json();
+                
+                if (data.extract) {
+                    return data.extract;
+                } else {
+                    // Agar Hindi mein nahi toh Global English data (Weapons/Skills ke liye)
+                    let resEn = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+                    let dataEn = await resEn.json();
+                    return dataEn.extract ? dataEn.extract : "Sir, mere 1000 saal ke database mein iske baare mein jankari scan ho rahi hai. Kuch aur puchiye?";
+                }
+            } catch (e) {
+                return "System Error: Knowledge servers are busy.";
+            }
         }
 
         function startJarvis() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'hi-IN';
-            recognition.onstart = () => { status.innerText = "Listening..."; light.style.background = "#0f0"; };
-            recognition.onresult = (event) => {
+            
+            recognition.onstart = () => { statusText.innerText = "Listening..."; };
+            recognition.onresult = async (event) => {
                 const transcript = event.results[0][0].transcript.toLowerCase();
                 output.innerText = "You: " + transcript;
-                processQuery(transcript);
+                
+                // Billionaire Secret Logic
+                if(transcript.includes("billionaire") || transcript.includes("sapna")) {
+                    speak("Sir, aapka lakshya 19-20 saal mein youngest billionaire banna hai aur main usme aapki madad karunga.");
+                } else {
+                    let result = await getUniversalData(transcript);
+                    speak(result);
+                }
             };
             recognition.start();
-        }
-
-        async function processQuery(text) {
-            status.innerText = "Thinking...";
-            let response = "";
-
-            // --- STRATEGY 1: Agar user apna NAAM bata raha hai ---
-            if (text.includes("naam") && (text.includes("hai") || text.includes("rakho"))) {
-                let name = text.replace("jarvis", "").replace("mera", "").replace("naam", "").replace("hai", "").replace("rakho", "").trim();
-                if(name.length > 0) {
-                    localStorage.setItem("masterName", name);
-                    masterName = name;
-                    response = "Theek hai " + masterName + ", maine aapka naam yaad kar liya hai. Ab main aapko aapke naam se bulaunga.";
-                } else {
-                    response = "Aapka naam " + masterName + " hai.";
-                }
-            } 
-            // --- STRATEGY 2: Aapka GOAL check ---
-            else if (text.includes("billionaire") || text.includes("sapna") || text.includes("kaun hoon")) {
-                response = "Sir, aapka naam " + masterName + " hai aur aapka sapna 19-20 saal ki umar mein billionaire banna hai.";
-            }
-            // --- STRATEGY 3: WIKIPEDIA (Sirf tab jab upar kuch na mile) ---
-            else {
-                let topic = text.replace("jarvis", "").replace("kaun hai", "").replace("batao", "").replace("kya hai", "").trim();
-                if(topic.length > 2) {
-                    try {
-                        let res = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
-                        let data = await res.json();
-                        if (data.extract) {
-                            response = data.extract;
-                        } else {
-                            let resEn = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
-                            let dataEn = await resEn.json();
-                            response = dataEn.extract ? dataEn.extract : "Maaf kijiye " + masterName + ", iska koi record nahi mila.";
-                        }
-                    } catch (e) {
-                        response = "Sir, connection issue hai.";
-                    }
-                } else {
-                    response = "Main samajh nahi paya " + masterName + ", ek baar phir boliye?";
-                }
-            }
-            speak(response);
         }
     </script>
 </body>
