@@ -14,9 +14,9 @@
 </head>
 <body>
     <div class="jarvis-box">
-        <h1>JARVIS v2.0</h1>
+        <h1>JARVIS v2.1</h1>
         <div><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
-        <div id="output">Bhai, main taiyar hoon. 'Start' dabao aur mujhse 1000 saal ki history ya kuch bhi poocho.</div>
+        <div id="output">Bhai, main taiyar hoon. Mujhse kuch bhi poochiye.</div>
         <button onclick="startJarvis()">START JARVIS</button>
     </div>
 
@@ -36,7 +36,7 @@
 
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript.toLowerCase();
-                output.innerText = "Aapne kaha: " + transcript;
+                output.innerText = "You: " + transcript;
                 processQuery(transcript);
             };
 
@@ -47,22 +47,25 @@
             status.innerText = "Searching Brain...";
             let response = "";
 
-            if (text.includes("kaun") || text.includes("kya") || text.includes("history") || text.includes("itihas")) {
-                let searchTopic = text.replace("jarvis", "").replace("kaun tha", "").replace("kya hai", "").trim();
+            if (text.includes("billionaire") || text.includes("ameer")) {
+                response = "Sir, aap 19 se 20 saal ki umar mein duniya ke youngest billionaire banenge. Ye mera vada hai!";
+            } else {
+                // Wikipedia Search Logic
+                let searchTopic = text.replace("jarvis", "").replace("batao", "").replace("kaun hai", "").replace("kaun tha", "").replace("kya hai", "").trim();
                 const url = `https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTopic)}`;
                 
                 try {
-                    const data = await fetch(url).then(res => res.json());
-                    response = data.extract ? data.extract : "Bhai, iske baare mein 1000 saal ke records mein kuch nahi mila.";
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    if (data.extract) {
+                        response = data.extract;
+                    } else {
+                        response = "Bhai, mujhe '" + searchTopic + "' ke baare mein abhi jaankari nahi mili.";
+                    }
                 } catch (e) {
-                    response = "Bhai, mera dimaag internet se connect nahi ho paa raha.";
+                    response = "Bhai, internet connection check karein, main dimaag nahi chala paa raha.";
                 }
-            } else if (text.includes("billionaire")) {
-                response = "Sir, aap 19 se 20 saal ki umar mein duniya ke youngest billionaire banenge. Main aapki poori madad karunga.";
-            } else {
-                response = "Main samajh gaya. Aapne kaha: " + text + ". Kya main iske baare mein history check karoon?";
             }
-
             speak(response);
         }
 
