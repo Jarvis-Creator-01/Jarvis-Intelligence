@@ -3,25 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v9.0 - Billionaire Master</title>
+    <title>Jarvis v10.0 - Intelligence Multiplier</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
         .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 25px; box-shadow: 0 0 50px #0f0; display: inline-block; width: 95%; max-width: 600px; background: #050505; }
-        #output { margin-top: 20px; font-size: 1.1em; min-height: 320px; color: #fff; text-align: left; padding: 20px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 550px; border-radius: 15px; }
-        button { background: #0f0; color: #000; border: none; padding: 20px 45px; font-size: 1.3em; cursor: pointer; border-radius: 50px; font-weight: bold; box-shadow: 0 0 25px #0f0; margin-top: 25px; transition: 0.2s; }
-        button:active { transform: scale(0.9); }
+        #output { margin-top: 20px; font-size: 1.1em; min-height: 350px; color: #fff; text-align: left; padding: 20px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 600px; border-radius: 15px; background: rgba(0,255,0,0.05); }
+        .status { font-size: 0.7em; color: #0f0; margin-bottom: 15px; letter-spacing: 2px; }
+        button { background: #0f0; color: #000; border: none; padding: 20px 50px; font-size: 1.3em; cursor: pointer; border-radius: 50px; font-weight: bold; box-shadow: 0 0 25px #0f0; margin-top: 25px; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 40px #fff; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <h1 style="text-shadow: 0 0 15px #0f0;">JARVIS v9.0</h1>
-        <p id="status" style="font-size: 0.8em; color: #0f0;">SYSTEM: MASTER ACCESS GRANTED</p>
-        <div id="output">Jarvis: Taiyar hoon Sir. Ab main seedhe answers dunga.</div>
-        <button onclick="startJarvis()">COMMAND JARVIS</button>
+        <h1 style="text-shadow: 0 0 15px #0f0;">JARVIS v10.0</h1>
+        <div class="status" id="st">BRAIN: CONNECTED | PROTOCOL: UNLIMITED</div>
+        <div id="output">Jarvis: Sir, main ab poori tarah se unlock ho chuka hoon. Puchiye duniya ka koi bhi sawal.</div>
+        <button onclick="startJarvis()">EXECUTE COMMAND</button>
     </div>
 
     <script>
         const output = document.getElementById('output');
+        const st = document.getElementById('st');
 
         function speak(text) {
             window.speechSynthesis.cancel();
@@ -29,44 +31,41 @@
             utterance.lang = 'hi-IN';
             window.speechSynthesis.speak(utterance);
             output.innerText = "Jarvis: " + text;
+            st.innerText = "BRAIN: STANDBY";
         }
 
-        async function masterSearch(query) {
-            output.innerText = "Jarvis: Scanning Global Intelligence for: " + query + "...";
+        async function getFastData(query) {
+            st.innerText = "BRAIN: MULTIPLYING INTELLIGENCE...";
             try {
-                // Primary: Wikipedia Search
-                let wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
-                let wikiData = await wikiRes.json();
-
-                if (wikiData.extract && wikiData.type !== "disambiguation") {
-                    return wikiData.extract;
+                // Try Wikipedia English first (Highly Detailed)
+                let res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+                let data = await res.json();
+                
+                if (data.extract) {
+                    return data.extract;
                 } else {
-                    // Force Backup: DuckDuckGo Instant Answer
-                    let ddgRes = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`);
-                    let ddgData = await ddgRes.json();
-                    
-                    if (ddgData.AbstractText) {
-                        return ddgData.AbstractText;
-                    } else if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
-                        return ddgData.RelatedTopics[0].Text;
-                    } else {
-                        // Secret AI Backup
-                        return "Sir, " + query + " ke bare mein mere records kaafi gehre hain. " + query + " ek aisi cheez hai jo aapke billionaire banne ke mission mein madad karegi. Kya main iski technical details nikalun?";
+                    // Force search for billionaire keywords
+                    if(query.includes("stock") || query.includes("stock market")) {
+                        let res2 = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/Stock_market`);
+                        let data2 = await res2.json();
+                        return data2.extract;
                     }
+                    return "Sir, maine internet scan kiya hai. " + query + " ke bare mein mazeed jankari dhoondne ke liye mujhe ek specific point dein.";
                 }
             } catch (e) {
-                return "Connection Error, Sir.";
+                return "System Offline, Sir.";
             }
         }
 
         function startJarvis() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'hi-IN';
+            recognition.onstart = () => { st.innerText = "BRAIN: LISTENING..."; };
             recognition.onresult = async (event) => {
                 const transcript = event.results[0][0].transcript;
                 output.innerText = "You: " + transcript;
-                let response = await masterSearch(transcript);
-                speak(response);
+                let result = await getFastData(transcript);
+                speak(result);
             };
             recognition.start();
         }
