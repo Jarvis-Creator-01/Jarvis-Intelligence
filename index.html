@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v6.1 - Financial Expert</title>
+    <title>Jarvis v7.0 - Universal AI</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
-        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 95%; max-width: 600px; margin-top: 30px; }
-        #output { margin-top: 25px; font-size: 1.1em; min-height: 250px; color: #fff; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.6; overflow-y: auto; max-height: 500px; }
-        button { background: #0f0; color: #000; border: none; padding: 15px 30px; font-size: 1.1em; cursor: pointer; border-radius: 10px; font-weight: bold; box-shadow: 0 0 15px #0f0; margin-top: 20px; }
+        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 95%; max-width: 600px; margin-top: 20px; }
+        #output { margin-top: 20px; font-size: 1.1em; min-height: 280px; color: #fff; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.6; overflow-y: auto; max-height: 450px; }
+        .status-light { width: 12px; height: 12px; background: #f00; border-radius: 50%; display: inline-block; margin-right: 8px; }
+        button { background: #0f0; color: #000; border: none; padding: 15px 35px; font-size: 1.1em; cursor: pointer; border-radius: 10px; font-weight: bold; box-shadow: 0 0 15px #0f0; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <h1 style="letter-spacing: 3px;">JARVIS FINANCIAL v6.1</h1>
-        <div id="output">Jarvis: Taiyar hoon Sir. Stock market, business ya kisi bhi skill ke bare mein puchiye.</div>
-        <button onclick="startJarvis()">START SCANNING</button>
+        <h1 style="letter-spacing: 3px; margin: 10px;">JARVIS v7.0</h1>
+        <div><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
+        <div id="output">Jarvis: Taiyar hoon Sir. Puchiye duniya ki kisi bhi chiz ke bare mein.</div>
+        <button onclick="startJarvis()">INITIATE SCAN</button>
     </div>
 
     <script>
         const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const light = document.getElementById('light');
 
         function speak(text) {
             window.speechSynthesis.cancel();
@@ -27,38 +31,51 @@
             utterance.lang = 'hi-IN';
             window.speechSynthesis.speak(utterance);
             output.innerText = "Jarvis: " + text;
+            light.style.background = "#f00";
+            status.innerText = "System Standby";
         }
 
-        async function getDeepData(query) {
-            // Auto-correct for common billionaire keywords
-            let finalQuery = query;
-            if (query.includes("stoke") || query.includes("stock")) finalQuery = "Stock market";
-            if (query.includes("website") || query.includes("web")) finalQuery = "World Wide Web";
+        async function fetchGlobalKnowledge(query) {
+            status.innerText = "Searching Global Servers...";
+            light.style.background = "#ff0";
+            
+            // Special Auto-Correct for high priority topics
+            let searchQuery = query;
+            if(query.includes("stoke") || query.includes("stock")) searchQuery = "Stock market fundamentals";
+            if(query.includes("weapon") || query.includes("hathiyar")) searchQuery = "Advanced weaponry";
 
             try {
-                // Pehle English database check karega (Badi tech/finance info ke liye)
-                let resEn = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(finalQuery)}`);
-                let dataEn = await resEn.json();
+                // English Search (Best for Tech/Finance/Weapons)
+                let res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchQuery)}`);
+                let data = await res.json();
                 
-                if (dataEn.extract) {
-                    return dataEn.extract;
+                if (data.extract) {
+                    return data.extract;
                 } else {
-                    let resHi = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(finalQuery)}`);
+                    // Hindi Search (Best for History/Rules)
+                    let resHi = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
                     let dataHi = await resHi.json();
-                    return dataHi.extract ? dataHi.extract : "Sir, mere 1000 saal ke records mein iska data abhi update ho raha hai.";
+                    return dataHi.extract ? dataHi.extract : "Sir, mere 1000 saal ke database mein is topic par research abhi jaari hai.";
                 }
             } catch (e) {
-                return "Connectivity error, Sir.";
+                return "Sir, server se jankari nahi mil pa rahi hai.";
             }
         }
 
         function startJarvis() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'hi-IN';
+            
+            recognition.onstart = () => { 
+                status.innerText = "Listening to Command..."; 
+                light.style.background = "#0f0";
+            };
+
             recognition.onresult = async (event) => {
                 const transcript = event.results[0][0].transcript.toLowerCase();
                 output.innerText = "You: " + transcript;
-                let result = await getDeepData(transcript);
+                
+                let result = await fetchGlobalKnowledge(transcript);
                 speak(result);
             };
             recognition.start();
