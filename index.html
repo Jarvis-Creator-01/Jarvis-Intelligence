@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis AI v3.1</title>
+    <title>Jarvis v3.2 - Final</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
         .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 90%; max-width: 500px; margin-top: 50px; }
@@ -14,7 +14,7 @@
 </head>
 <body>
     <div class="jarvis-box">
-        <h1 style="letter-spacing: 5px;">JARVIS v3.1</h1>
+        <h1 style="letter-spacing: 5px;">JARVIS v3.2</h1>
         <div><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
         <div id="output">Jarvis: Taiyar hoon Sir.</div>
         <button onclick="startJarvis()">START JARVIS</button>
@@ -24,8 +24,6 @@
         const output = document.getElementById('output');
         const status = document.getElementById('status');
         const light = document.getElementById('light');
-        
-        // Memory Load
         let masterName = localStorage.getItem("masterName") || "Sir";
 
         function speak(message) {
@@ -41,18 +39,12 @@
         function startJarvis() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'hi-IN';
-
-            recognition.onstart = () => {
-                status.innerText = "Listening...";
-                light.style.background = "#0f0";
-            };
-
+            recognition.onstart = () => { status.innerText = "Listening..."; light.style.background = "#0f0"; };
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript.toLowerCase();
                 output.innerText = "You: " + transcript;
                 processQuery(transcript);
             };
-
             recognition.start();
         }
 
@@ -60,41 +52,36 @@
             status.innerText = "Thinking...";
             let response = "";
 
-            // 1. NAME STORAGE LOGIC (Strong Check)
-            if (text.includes("mera naam") || text.includes("naam hai")) {
-                let name = text.replace("jarvis", "").replace("mera naam", "").replace("naam hai", "").replace("rakho", "").replace("hai", "").trim();
+            // 1. MEMORY: Agar user naam bata raha hai
+            if (text.includes("naam") && (text.includes("hai") || text.includes("rakho"))) {
+                let name = text.replace("jarvis", "").replace("mera", "").replace("naam", "").replace("hai", "").replace("rakho", "").trim();
                 if(name.length > 0) {
                     localStorage.setItem("masterName", name);
                     masterName = name;
-                    response = "Theek hai " + masterName + ", maine aapka naam yaad kar liya hai. Ab boliye, main kya madad kar sakta hoon?";
+                    response = "Theek hai " + masterName + ", maine aapka naam yaad kar liya hai.";
                 } else {
                     response = "Aapka naam " + masterName + " hai.";
                 }
             } 
-            // 2. BILLIONAIRE GOAL LOGIC
-            else if (text.includes("billionaire") || text.includes("sapna") || text.includes("kaun hoon")) {
-                response = masterName + ", aap 15 saal ke hain aur aapka lakshya 19 se 20 saal ki umar mein billionaire banna hai.";
+            // 2. GOAL: Billionaire ki baat
+            else if (text.includes("billionaire") || text.includes("sapna") || text.includes("lakshya")) {
+                response = masterName + ", aapka target 19 se 20 saal ki umar mein youngest billionaire banna hai. Main aapke saath hoon.";
             }
-            // 3. WIKIPEDIA HISTORY LOGIC (Only if above not matched)
+            // 3. HISTORY: Baki sab Wikipedia par
             else {
                 let topic = text.replace("jarvis", "").replace("kaun hai", "").replace("batao", "").replace("kya hai", "").trim();
                 if(topic.length > 2) {
                     try {
                         let res = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
                         let data = await res.json();
-                        if (data.extract) {
-                            response = data.extract;
-                        } else {
+                        if (data.extract) { response = data.extract; } 
+                        else {
                             let resEn = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
                             let dataEn = await resEn.json();
                             response = dataEn.extract ? dataEn.extract : "Maaf kijiye " + masterName + ", iska koi record nahi mila.";
                         }
-                    } catch (e) {
-                        response = "Sir, connection issue hai.";
-                    }
-                } else {
-                    response = "Bhai, main samajh nahi paya, ek baar phir boliye?";
-                }
+                    } catch (e) { response = "Sir, internet connectivity issue hai."; }
+                } else { response = "Main sun nahi paya, ek baar phir boliye?"; }
             }
             speak(response);
         }
