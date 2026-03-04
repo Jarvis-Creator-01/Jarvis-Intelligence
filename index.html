@@ -3,65 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v7.5 - Internet Master</title>
+    <title>Jarvis v8.0 - Billionaire Edition</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
-        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 95%; max-width: 600px; margin-top: 20px; }
-        #output { margin-top: 20px; font-size: 1.1em; min-height: 280px; color: #fff; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.6; overflow-y: auto; max-height: 450px; }
-        button { background: #0f0; color: #000; border: none; padding: 15px 35px; font-size: 1.1em; cursor: pointer; border-radius: 10px; font-weight: bold; box-shadow: 0 0 15px #0f0; margin-top: 20px; }
-        .status { color: #0f0; font-size: 0.8em; text-transform: uppercase; margin-bottom: 10px; }
+        body { background: #000; color: #0f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; }
+        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 40px #0f0; display: inline-block; width: 95%; max-width: 600px; background: rgba(0, 20, 0, 0.9); }
+        #output { margin-top: 20px; font-size: 1.1em; min-height: 300px; color: #fff; text-align: left; padding: 20px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 500px; background: #050505; border-radius: 10px; }
+        .glow-text { text-shadow: 0 0 10px #0f0; letter-spacing: 2px; }
+        button { background: #0f0; color: #000; border: none; padding: 18px 40px; font-size: 1.2em; cursor: pointer; border-radius: 50px; font-weight: bold; box-shadow: 0 0 20px #0f0; margin-top: 25px; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 30px #fff; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <div class="status" id="st">System: Online</div>
-        <h1 style="letter-spacing: 3px;">JARVIS v7.5</h1>
-        <div id="output">Jarvis: Taiyar hoon Sir. Duniya ki har jankari ab mere kabze mein hai.</div>
-        <button onclick="startJarvis()">MASTER SCAN</button>
+        <h1 class="glow-text">JARVIS v8.0</h1>
+        <p style="color: #0f0; font-size: 0.8em;">STATUS: UNLIMITED KNOWLEDGE MODE ONLINE</p>
+        <div id="output">Jarvis: Sir, main ab poore internet se juda hoon. Puchiye duniya ka koi bhi sawal.</div>
+        <button onclick="startJarvis()">COMMAND JARVIS</button>
     </div>
 
     <script>
         const output = document.getElementById('output');
-        const st = document.getElementById('st');
 
         function speak(text) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'hi-IN';
+            utterance.pitch = 1;
+            utterance.rate = 1;
             window.speechSynthesis.speak(utterance);
             output.innerText = "Jarvis: " + text;
-            st.innerText = "System: Standby";
         }
 
-        async function deepSearch(query) {
-            st.innerText = "Deep Scanning Internet...";
+        async function ultimateSearch(query) {
+            output.innerText = "Jarvis: Deep scanning global servers for: " + query + "...";
             try {
-                // Pehle DuckDuckGo se pucho (Ye har chiz ka jawab deta hai)
-                let response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`);
-                let data = await response.json();
-                
-                if (data.AbstractText) {
-                    return data.AbstractText;
+                // Combined Force: Wikipedia + DuckDuckGo Proxy
+                let wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+                let wikiData = await wikiRes.json();
+
+                if (wikiData.extract) {
+                    return wikiData.extract;
                 } else {
-                    // Agar wahan nahi mila toh Wikipedia backup
-                    let resWiki = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
-                    let dataWiki = await resWiki.json();
-                    return dataWiki.extract ? dataWiki.extract : "Sir, is topic ki jankari bohot secret hai, lekin mere 1000 saal purane experience ke mutabik ye jald update hogi.";
+                    // Force Search via duckduckgo search engine
+                    let ddgRes = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`);
+                    let ddgData = await ddgRes.json();
+                    
+                    if (ddgData.AbstractText) {
+                        return ddgData.AbstractText;
+                    } else {
+                        return "Sir, maine internet ke crores of records scan kiye hain. " + query + " ek bohot bada field hai, aap iske baare mein kya specific janna chahte hain?";
+                    }
                 }
             } catch (e) {
-                return "Connectivity issue, Sir.";
+                return "System Error, Sir. Connection with global database lost.";
             }
         }
 
         function startJarvis() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'hi-IN';
-            recognition.onstart = () => { st.innerText = "Listening..."; };
+            recognition.onstart = () => { output.innerText = "Jarvis: Listening, Sir..."; };
+            
             recognition.onresult = async (event) => {
-                const transcript = event.results[0][0].transcript.toLowerCase();
+                const transcript = event.results[0][0].transcript;
                 output.innerText = "You: " + transcript;
-                let result = await deepSearch(transcript);
-                speak(result);
+                
+                let response = await ultimateSearch(transcript);
+                speak(response);
             };
             recognition.start();
         }
