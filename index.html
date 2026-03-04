@@ -1,33 +1,79 @@
-// Is hisse ko apne <script> ke andar respond function mein update karein
-async function respond(text) {
-    status.innerText = "Thinking...";
-    let response = "";
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis AI - History Edition</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
+        .jarvis-box { border: 2px solid #0f0; padding: 20px; border-radius: 15px; box-shadow: 0 0 20px #0f0; display: inline-block; width: 90%; max-width: 500px; }
+        #output { margin-top: 20px; font-size: 1.1em; min-height: 100px; color: #fff; overflow-y: auto; text-align: left; padding: 10px; border-top: 1px solid #333; }
+        button { background: #0f0; color: #000; border: none; padding: 15px 30px; font-size: 1em; cursor: pointer; border-radius: 5px; font-weight: bold; margin-top: 20px; box-shadow: 0 0 10px #0f0; }
+        .status-light { width: 15px; height: 15px; background: #f00; border-radius: 50%; display: inline-block; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="jarvis-box">
+        <h1>JARVIS v2.0</h1>
+        <div><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
+        <div id="output">Bhai, main taiyar hoon. 'Start' dabao aur mujhse 1000 saal ki history ya kuch bhi poocho.</div>
+        <button onclick="startJarvis()">START JARVIS</button>
+    </div>
 
-    // 1000 saal ki history aur general knowledge ke liye Wikipedia ka use
-    if (text.includes("kya hai") || text.includes("kaun tha") || text.includes("history")) {
-        const query = text.replace("jarvis", "").trim();
-        const url = `https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-        
-        try {
-            const data = await fetch(url).then(res => res.json());
-            response = data.extract || "Bhai, iske baare mein mujhe thodi aur research karni padegi.";
-        } catch (e) {
-            response = "Bhai, internet connection check karein, main dimaag nahi chala paa raha.";
+    <script>
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const light = document.getElementById('light');
+
+        function startJarvis() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'hi-IN';
+
+            recognition.onstart = () => {
+                status.innerText = "Listening...";
+                light.style.background = "#0f0";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                output.innerText = "Aapne kaha: " + transcript;
+                processQuery(transcript);
+            };
+
+            recognition.start();
         }
-    } else if (text.includes("billionaire")) {
-        response = "Aap 19 saal tak youngest billionaire banenge, ye mera vada hai!";
-    } else {
-        response = "Aapne kaha: " + text + ". Main iska matlab samajhne ki koshish kar raha hoon.";
-    }
 
-    speak(response);
-}
+        async function processQuery(text) {
+            status.innerText = "Searching Brain...";
+            let response = "";
 
-function speak(message) {
-    const speech = new SpeechSynthesisUtterance(message);
-    speech.lang = 'hi-IN';
-    window.speechSynthesis.speak(speech);
-    output.innerText = "Jarvis: " + message;
-    status.innerText = "System Standby";
-    light.style.background = "#f00";
-}
+            if (text.includes("kaun") || text.includes("kya") || text.includes("history") || text.includes("itihas")) {
+                let searchTopic = text.replace("jarvis", "").replace("kaun tha", "").replace("kya hai", "").trim();
+                const url = `https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTopic)}`;
+                
+                try {
+                    const data = await fetch(url).then(res => res.json());
+                    response = data.extract ? data.extract : "Bhai, iske baare mein 1000 saal ke records mein kuch nahi mila.";
+                } catch (e) {
+                    response = "Bhai, mera dimaag internet se connect nahi ho paa raha.";
+                }
+            } else if (text.includes("billionaire")) {
+                response = "Sir, aap 19 se 20 saal ki umar mein duniya ke youngest billionaire banenge. Main aapki poori madad karunga.";
+            } else {
+                response = "Main samajh gaya. Aapne kaha: " + text + ". Kya main iske baare mein history check karoon?";
+            }
+
+            speak(response);
+        }
+
+        function speak(message) {
+            const speech = new SpeechSynthesisUtterance(message);
+            speech.lang = 'hi-IN';
+            window.speechSynthesis.speak(speech);
+            output.innerText = "Jarvis: " + message;
+            status.innerText = "System Standby";
+            light.style.background = "#f00";
+        }
+    </script>
+</body>
+</html>
