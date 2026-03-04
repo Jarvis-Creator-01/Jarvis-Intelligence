@@ -1,49 +1,116 @@
-async function processQuery(text) {
-    status.innerText = "Searching Global Brain...";
-    let response = "";
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis AI - World Mission</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
+        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 30px #0f0; display: inline-block; width: 90%; max-width: 500px; }
+        #output { margin-top: 25px; font-size: 1.1em; min-height: 120px; color: #fff; overflow-y: auto; text-align: left; padding: 15px; border-top: 1px solid #333; line-height: 1.5; }
+        button { background: #0f0; color: #000; border: none; padding: 15px 40px; font-size: 1.2em; cursor: pointer; border-radius: 10px; font-weight: bold; margin-top: 25px; box-shadow: 0 0 15px #0f0; transition: 0.3s; }
+        button:active { transform: scale(0.95); }
+        .status-light { width: 15px; height: 15px; background: #f00; border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 10px #f00; }
+    </style>
+</head>
+<body>
+    <div class="jarvis-box">
+        <h1 style="letter-spacing: 5px;">JARVIS v3.0</h1>
+        <div><div class="status-light" id="light"></div> <span id="status">System Standby</span></div>
+        <div id="output">Welcome back. Main aapke billionaire mission ke liye taiyar hoon.</div>
+        <button onclick="startJarvis()">START JARVIS</button>
+    </div>
 
-    // 1. Personal Memory & Goal Check
-    if (text.includes("billionaire") || text.includes("sapna")) {
-        response = "Sir, aapka lakshya 19-20 saal ki umar mein youngest billionaire banna hai. Main aapke saath hoon.";
-    } 
-    else {
-        // Cleaning the search topic
-        let topic = text.replace("jarvis", "")
-                         .replace("kaun hai", "")
-                         .replace("kaun tha", "")
-                         .replace("kya hai", "")
-                         .replace("batao", "")
-                         .replace("ke baare mein", "")
-                         .trim();
+    <script>
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const light = document.getElementById('light');
+        
+        // Memory Load
+        let masterName = localStorage.getItem("masterName") || "Sir";
 
-        if(topic.length > 0) {
-            // Priority 1: Hindi Wikipedia
-            const hindiUrl = `https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
-            // Priority 2: English Wikipedia (Backup)
-            const englishUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
-            
-            try {
-                let res = await fetch(hindiUrl);
-                let data = await res.json();
-                
-                if (data.extract) {
-                    response = data.extract;
-                } else {
-                    // Agar Hindi mein nahi mila, English check karo
-                    let resEn = await fetch(englishUrl);
-                    let dataEn = await resEn.json();
-                    if (dataEn.extract) {
-                        response = "Sir, Hindi records mein nahi mila par English records ke mutabik: " + dataEn.extract;
-                    } else {
-                        response = "Sir, '" + topic + "' ke baare mein 1000 saal ke records mein kuch nahi mila. Ek baar sirf 'Abdul Kalam' bol kar dekhiye?";
-                    }
-                }
-            } catch (e) {
-                response = "Sir, internet connectivity mein issue hai.";
-            }
-        } else {
-            response = "Aapne kuch kaha, par main samajh nahi paya.";
+        function speak(message) {
+            window.speechSynthesis.cancel(); // Purani awaaz band karne ke liye
+            const speech = new SpeechSynthesisUtterance(message);
+            speech.lang = 'hi-IN';
+            speech.rate = 1.1; // Thodi fast speed
+            window.speechSynthesis.speak(speech);
+            output.innerText = "Jarvis: " + message;
+            status.innerText = "System Standby";
+            light.style.background = "#f00";
         }
-    }
-    speak(response);
-}
+
+        function startJarvis() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'hi-IN';
+
+            recognition.onstart = () => {
+                status.innerText = "Listening...";
+                light.style.background = "#0f0";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                output.innerText = "You: " + transcript;
+                processQuery(transcript);
+            };
+
+            recognition.onerror = () => {
+                status.innerText = "Error!";
+                light.style.background = "#f00";
+            };
+
+            recognition.start();
+        }
+
+        async function processQuery(text) {
+            status.innerText = "Processing...";
+            let response = "";
+
+            // 1. Memory: Naam Yaad Rakhna
+            if (text.includes("mera naam") && (text.includes("rakho") || text.includes("hai"))) {
+                let name = text.replace("jarvis", "").replace("mera naam", "").replace("rakho", "").replace("hai", "").trim();
+                if(name) {
+                    localStorage.setItem("masterName", name);
+                    masterName = name;
+                    response = "Theek hai " + masterName + ", maine aapka naam hamesha ke liye yaad kar liya hai.";
+                } else {
+                    response = "Aapka naam " + masterName + " hai.";
+                }
+            } 
+            // 2. Billionaire Goal Check
+            else if (text.includes("billionaire") || text.includes("sapna") || text.includes("ameer")) {
+                response = masterName + ", aapka lakshya 19 se 20 saal ki umar mein duniya ka youngest billionaire banna hai. Main aapke saath hoon.";
+            }
+            // 3. Global History Search (Double Brain)
+            else {
+                let topic = text.replace("jarvis", "").replace("kaun hai", "").replace("kaun tha", "").replace("kya hai", "").replace("batao", "").replace("about", "").trim();
+                
+                if(topic.length > 0) {
+                    const hindiUrl = `https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
+                    const englishUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
+                    
+                    try {
+                        let res = await fetch(hindiUrl);
+                        let data = await res.json();
+                        
+                        if (data.extract) {
+                            response = data.extract;
+                        } else {
+                            // Backup English Search
+                            let resEn = await fetch(englishUrl);
+                            let dataEn = await resEn.json();
+                            response = dataEn.extract ? "Sir, English records ke mutabik: " + dataEn.extract : "Bhai, '" + topic + "' ke baare mein koi record nahi mila.";
+                        }
+                    } catch (e) {
+                        response = "Sir, connection slow hai, main dimaag nahi chala paa raha.";
+                    }
+                } else {
+                    response = "Bhai, please kisi topic ka naam lein.";
+                }
+            }
+            speak(response);
+        }
+    </script>
+</body>
+</html>
