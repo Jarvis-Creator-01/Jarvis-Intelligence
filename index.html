@@ -3,23 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v21.0 - The Infinite Brain</title>
+    <title>Jarvis v23.0 - Hybrid Brain</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
         .jarvis-box { border: 4px solid #0f0; padding: 30px; border-radius: 25px; box-shadow: 0 0 80px #0f0; display: inline-block; width: 95%; max-width: 650px; background: #050505; }
-        #output { margin-top: 20px; font-size: 1.25em; min-height: 400px; color: #fff; text-align: left; padding: 25px; border-top: 2px solid #0f0; line-height: 1.7; overflow-y: auto; max-height: 600px; background: rgba(0,255,0,0.05); border-radius: 15px; }
-        button { background: #0f0; color: #000; border: none; padding: 25px; font-size: 1.6em; cursor: pointer; border-radius: 60px; font-weight: bold; box-shadow: 0 0 40px #0f0; margin-top: 25px; width: 100%; transition: 0.4s; text-transform: uppercase; }
-        .status-light { height: 12px; width: 12px; background: #0f0; border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 10px #0f0; }
+        #output { margin-top: 20px; font-size: 1.2em; min-height: 450px; color: #fff; text-align: left; padding: 25px; border-top: 2px solid #0f0; line-height: 1.7; overflow-y: auto; max-height: 600px; background: rgba(0,255,0,0.05); }
+        button { background: #0f0; color: #000; border: none; padding: 25px; font-size: 1.5em; cursor: pointer; border-radius: 60px; font-weight: bold; box-shadow: 0 0 40px #0f0; margin-top: 25px; width: 100%; text-transform: uppercase; }
+        .status { font-size: 0.8em; color: #0f0; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <div style="color: #0f0; font-size: 0.8em; margin-bottom: 10px;">
-            <span class="status-light"></span> 1000 YEARS HISTORY DATABASE: ONLINE
-        </div>
-        <h1 style="margin: 0; text-shadow: 0 0 20px #0f0;">JARVIS v21.0</h1>
-        <div id="output">Jarvis: Sir, main taiyar hoon. 1000 saal purani history ho ya aaj ka business, puchiye, main ghumaoonga nahi.</div>
-        <button onclick="startJarvis()">GIVE COMMAND</button>
+        <div class="status">HYBRID BRAIN: CONNECTED | GLOBAL SEARCH: ACTIVE</div>
+        <h1 style="text-shadow: 0 0 20px #0f0;">JARVIS v23.0</h1>
+        <div id="output">Jarvis: Sir, main taiyar hoon. Ab mere paas mera apna dimag bhi hai aur poori duniya ka internet bhi. Puchiye.</div>
+        <button onclick="startJarvis()">COMMAND MASTER</button>
     </div>
 
     <script>
@@ -29,45 +27,46 @@
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'hi-IN';
-            utterance.rate = 1.0;
             window.speechSynthesis.speak(utterance);
             output.innerText = "Jarvis: " + text;
         }
 
-        async function getInstantAnswer(query) {
-            output.innerText = "Jarvis: Accessing 1000-year records for: " + query + "...";
+        async function globalSearch(query) {
+            output.innerText = "Jarvis: Scanning global records for: " + query + "...";
             try {
-                // Using a more reliable open-source API for instant results
-                let response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`);
-                let data = await response.json();
+                // Try Wikipedia first (for facts/history)
+                let wikiRes = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+                let wikiData = await wikiRes.json();
                 
-                if (data.AbstractText) {
-                    return data.AbstractText;
+                if (wikiData.extract) {
+                    return wikiData.extract;
                 } else {
-                    // Internal Fallback Logic for Billionaire Mission
-                    if (query.includes("stock") || query.includes("paisa")) {
-                        return "Stock Market ek aisa system hai jahan companies ke shares ki trading hoti hai. Ise samajhna aapke 19-20 saal mein billionaire banne ke sapne ke liye sabse pehla kadam hai.";
-                    }
-                    if (query.includes("history") || query.includes("purana")) {
-                        return "Sir, 1000 saal pehle Bharat mein Chola aur Rajput vansh ka samrajya tha. Aap kisi vishisht raja ya yuddh ke baare mein puch sakte hain.";
-                    }
-                    return "Sir, is topic ki sateek jankari ye hai ki ye aapke mission ke liye mahatvapurna hai. Kya main iski technical depth mein jaoon?";
+                    // Try DuckDuckGo (for general info)
+                    let ddgRes = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`);
+                    let ddgData = await ddgRes.json();
+                    return ddgData.AbstractText || "Sir, is sawal ka jawab mere 1000 saal ke database mein mil raha hai, lekin internet access thoda slow hai. Kya main billioniare strategy samjhaun?";
                 }
             } catch (e) {
-                return "System bypass error, Sir. Lekin Taj Mahal Agra mein hai aur Stock Market ameer banne ka rasta.";
+                return "Sir, connection mein issue hai, lekin Taj Mahal Agra mein hai aur Stock Market ameer banne ka rasta hai.";
             }
         }
 
         function startJarvis() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'hi-IN';
-            recognition.onresult = async (event) => {
-                const transcript = event.results[0][0].transcript;
+            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            rec.lang = 'hi-IN';
+            rec.onresult = async (e) => {
+                const transcript = e.results[0][0].transcript;
                 output.innerText = "You: " + transcript;
-                let finalResponse = await getInstantAnswer(transcript);
-                speak(finalResponse);
+                
+                // Billionaire check
+                if (transcript.toLowerCase().includes("stock") || transcript.toLowerCase().includes("billionaire")) {
+                    speak("Stock Market ek aisa rasta hai jahan aap invest karke 19-20 saal tak billionaire ban sakte hain. Ise Compound Interest ka jadu kehte hain.");
+                } else {
+                    let result = await globalSearch(transcript);
+                    speak(result);
+                }
             };
-            recognition.start();
+            rec.start();
         }
     </script>
 </body>
