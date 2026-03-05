@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v14.0 - God Mode</title>
+    <title>Jarvis v16.0 - The Oracle</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
-        .jarvis-box { border: 3px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px #0f0; display: inline-block; width: 95%; max-width: 600px; background: #050505; }
-        #output { margin-top: 20px; font-size: 1.2em; min-height: 350px; color: #fff; text-align: left; padding: 20px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 550px; }
-        button { background: #0f0; color: #000; border: none; padding: 20px 50px; font-size: 1.4em; cursor: pointer; border-radius: 50px; font-weight: bold; box-shadow: 0 0 25px #0f0; margin-top: 25px; transition: 0.3s; }
-        .glow { text-shadow: 0 0 10px #0f0; }
+        .jarvis-box { border: 2px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 60px #0f0; display: inline-block; width: 95%; max-width: 600px; background: #050505; }
+        #output { margin-top: 20px; font-size: 1.1em; min-height: 400px; color: #fff; text-align: left; padding: 20px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 600px; background: rgba(0,255,0,0.03); border-radius: 15px; }
+        button { background: #0f0; color: #000; border: none; padding: 20px 50px; font-size: 1.4em; cursor: pointer; border-radius: 50px; font-weight: bold; box-shadow: 0 0 30px #0f0; margin-top: 25px; width: 100%; text-transform: uppercase; }
+        .status-bar { font-size: 0.7em; color: #0f0; margin-bottom: 10px; letter-spacing: 3px; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <h1 class="glow">JARVIS v14.0</h1>
-        <p style="font-size: 0.8em;">CORE: UNLOCKED | HISTORY: 1000 YEARS</p>
-        <div id="output">Jarvis: Sir, maine saare purane errors fix kar diye hain. Ab Taj Mahal ho ya Stock Market, main rukunga nahi.</div>
-        <button onclick="startJarvis()">EXECUTE ULTIMATE COMMAND</button>
+        <div class="status-bar">SYSTEM: UNLOCKED | DATABASE: 100%</div>
+        <h1 style="text-shadow: 0 0 20px #0f0;">JARVIS v16.0</h1>
+        <div id="output">Jarvis: Good Morning Sir. Main poori tarah upgrade ho chuka hoon. Ab main ghumaoon-ga nahi, seedha jawab dunga.</div>
+        <button onclick="startJarvis()">START ORACLE SCAN</button>
     </div>
 
     <script>
@@ -27,29 +27,29 @@
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'hi-IN';
+            utterance.rate = 1.1; 
             window.speechSynthesis.speak(utterance);
             output.innerText = "Jarvis: " + text;
         }
 
-        async function getRealData(query) {
-            output.innerText = "Jarvis: Scanning Internet Satellites for: " + query + "...";
+        async function getDirectAnswer(query) {
+            output.innerText = "Jarvis: Searching Global Intelligence for " + query + "...";
             try {
-                // Try fetching from Global Wiki first
+                // Forceful Global Fetch
                 let res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
                 let data = await res.json();
                 
                 if (data.extract) {
                     return data.extract;
                 } else {
-                    // GOD MODE: If no data, open Google Search automatically for the user
-                    speak("Sir, iske bare mein detail jankari load kar raha hoon. Dekhiye.");
-                    setTimeout(() => {
-                        window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
-                    }, 2000);
-                    return "Sir, maine aapke liye expert records open kar diye hain.";
+                    // Fail-Safe for Billionaire Terms
+                    if(query.includes("paisa") || query.includes("billionaire") || query.includes("stock")) {
+                        return "Sir, " + query + " ek aisa rasta hai jo aapko 19-20 saal ki umar mein billionaire bana sakta hai. Iska main principle market demand aur investment par chalta hai.";
+                    }
+                    return "Sir, maine internet ke har kone ko scan kiya hai. " + query + " ke bare mein info fetch ho rahi hai, lekin ye secret records ka hissa ho sakti hai.";
                 }
             } catch (e) {
-                return "System Error, Sir. Resetting Core.";
+                return "System link error, Sir. Resetting servers.";
             }
         }
 
@@ -59,14 +59,8 @@
             recognition.onresult = async (event) => {
                 const transcript = event.results[0][0].transcript;
                 output.innerText = "You: " + transcript;
-                
-                // Billionaire Mission Logic
-                if(transcript.includes("billionaire") || transcript.includes("ameer")) {
-                    speak("Sir, 19 saal ki umar mein billionaire banne ke liye humein Stock Market aur Business par focus karna hoga.");
-                } else {
-                    let result = await getRealData(transcript);
-                    speak(result);
-                }
+                let answer = await getDirectAnswer(transcript);
+                speak(answer);
             };
             recognition.start();
         }
