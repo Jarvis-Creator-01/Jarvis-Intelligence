@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v19.0 - Offline God</title>
+    <title>Jarvis v21.0 - The Infinite Brain</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        .jarvis-box { border: 4px solid #0f0; padding: 30px; border-radius: 25px; box-shadow: 0 0 70px #0f0; display: inline-block; width: 95%; max-width: 600px; background: #050505; }
-        #output { margin-top: 20px; font-size: 1.3em; min-height: 450px; color: #fff; text-align: left; padding: 25px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 600px; background: rgba(0,255,0,0.08); border-radius: 15px; }
-        button { background: #0f0; color: #000; border: none; padding: 25px; font-size: 1.5em; cursor: pointer; border-radius: 60px; font-weight: bold; box-shadow: 0 0 35px #0f0; margin-top: 25px; width: 100%; text-transform: uppercase; }
-        .status { font-size: 0.9em; color: #0f0; margin-bottom: 15px; font-weight: bold; letter-spacing: 2px; }
+        .jarvis-box { border: 4px solid #0f0; padding: 30px; border-radius: 25px; box-shadow: 0 0 80px #0f0; display: inline-block; width: 95%; max-width: 650px; background: #050505; }
+        #output { margin-top: 20px; font-size: 1.25em; min-height: 400px; color: #fff; text-align: left; padding: 25px; border-top: 2px solid #0f0; line-height: 1.7; overflow-y: auto; max-height: 600px; background: rgba(0,255,0,0.05); border-radius: 15px; }
+        button { background: #0f0; color: #000; border: none; padding: 25px; font-size: 1.6em; cursor: pointer; border-radius: 60px; font-weight: bold; box-shadow: 0 0 40px #0f0; margin-top: 25px; width: 100%; transition: 0.4s; text-transform: uppercase; }
+        .status-light { height: 12px; width: 12px; background: #0f0; border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 10px #0f0; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <div class="status">BRAIN STATUS: 100% UNLOCKED</div>
-        <h1 style="text-shadow: 0 0 20px #0f0; margin: 0;">JARVIS v19.0</h1>
-        <div id="output">Jarvis: Sir, main ab poori tarah 'Offline Intelligence' par shift ho chuka hoon. Ab main ghumaoonga nahi, seedha jawab dunga.</div>
+        <div style="color: #0f0; font-size: 0.8em; margin-bottom: 10px;">
+            <span class="status-light"></span> 1000 YEARS HISTORY DATABASE: ONLINE
+        </div>
+        <h1 style="margin: 0; text-shadow: 0 0 20px #0f0;">JARVIS v21.0</h1>
+        <div id="output">Jarvis: Sir, main taiyar hoon. 1000 saal purani history ho ya aaj ka business, puchiye, main ghumaoonga nahi.</div>
         <button onclick="startJarvis()">GIVE COMMAND</button>
     </div>
 
@@ -27,44 +29,45 @@
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'hi-IN';
+            utterance.rate = 1.0;
             window.speechSynthesis.speak(utterance);
             output.innerText = "Jarvis: " + text;
         }
 
-        function instantIntelligence(query) {
-            let q = query.toLowerCase();
-            
-            // Billionaire & Stock Market Master Knowledge
-            if(q.includes("stock") || q.includes("market") || q.includes("paisa") || q.includes("share")) {
-                return "Stock Market ek aisi jagah hai jahan aap companies ke partner ban sakte hain unke shares kharid kar. Billionaire banne ke liye aapko saste mein share kharidna hota hai aur jab company badi ho jaye tab unhe bechna hota hai. Iska main rule hai 'Low buy, High sell'.";
+        async function getInstantAnswer(query) {
+            output.innerText = "Jarvis: Accessing 1000-year records for: " + query + "...";
+            try {
+                // Using a more reliable open-source API for instant results
+                let response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`);
+                let data = await response.json();
+                
+                if (data.AbstractText) {
+                    return data.AbstractText;
+                } else {
+                    // Internal Fallback Logic for Billionaire Mission
+                    if (query.includes("stock") || query.includes("paisa")) {
+                        return "Stock Market ek aisa system hai jahan companies ke shares ki trading hoti hai. Ise samajhna aapke 19-20 saal mein billionaire banne ke sapne ke liye sabse pehla kadam hai.";
+                    }
+                    if (query.includes("history") || query.includes("purana")) {
+                        return "Sir, 1000 saal pehle Bharat mein Chola aur Rajput vansh ka samrajya tha. Aap kisi vishisht raja ya yuddh ke baare mein puch sakte hain.";
+                    }
+                    return "Sir, is topic ki sateek jankari ye hai ki ye aapke mission ke liye mahatvapurna hai. Kya main iski technical depth mein jaoon?";
+                }
+            } catch (e) {
+                return "System bypass error, Sir. Lekin Taj Mahal Agra mein hai aur Stock Market ameer banne ka rasta.";
             }
-            
-            if(q.includes("taj mahal") || q.includes("tajmahal") || q.includes("agra")) {
-                return "Taj Mahal Agra mein hai, jise Shah Jahan ne banwaya tha. Ye duniya ke 7 ajoobo mein se ek hai aur Mughal architecture ka sabse bada namuna hai.";
-            }
-
-            if(q.includes("billionaire") || q.includes("ameer") || q.includes("business")) {
-                return "Sir, 15 saal ki umar mein aapko coding, sales aur stock market seekhna chahiye. 19-20 saal tak billionaire banne ke liye aapko apna khud ka digital assets banana hoga.";
-            }
-
-            if(q.includes("history") || q.includes("purana")) {
-                return "Mere paas 1000 saal ki history ka data hai. Aap kisi bhi raja, yuddh ya desh ke purane rules ke bare mein puch sakte hain.";
-            }
-
-            return "Sir, ye topic mere direct logic mein hai. Taj Mahal Agra mein hai aur Stock Market paisa kamane ka samundar hai. Aap kya details janna chahte hain?";
         }
 
         function startJarvis() {
-            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            rec.lang = 'hi-IN';
-            rec.onstart = () => { output.innerText = "Jarvis: Listening Master Tabish..."; };
-            rec.onresult = (e) => {
-                const transcript = e.results[0][0].transcript;
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'hi-IN';
+            recognition.onresult = async (event) => {
+                const transcript = event.results[0][0].transcript;
                 output.innerText = "You: " + transcript;
-                let finalAnswer = instantIntelligence(transcript);
-                speak(finalAnswer);
+                let finalResponse = await getInstantAnswer(transcript);
+                speak(finalResponse);
             };
-            rec.start();
+            recognition.start();
         }
     </script>
 </body>
