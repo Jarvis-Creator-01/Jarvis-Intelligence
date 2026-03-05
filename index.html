@@ -3,68 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v23.0 - Hybrid Brain</title>
+    <title>Jarvis v24.0 - Billionaire Core</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        .jarvis-box { border: 4px solid #0f0; padding: 30px; border-radius: 25px; box-shadow: 0 0 80px #0f0; display: inline-block; width: 95%; max-width: 650px; background: #050505; }
-        #output { margin-top: 20px; font-size: 1.2em; min-height: 450px; color: #fff; text-align: left; padding: 25px; border-top: 2px solid #0f0; line-height: 1.7; overflow-y: auto; max-height: 600px; background: rgba(0,255,0,0.05); }
-        button { background: #0f0; color: #000; border: none; padding: 25px; font-size: 1.5em; cursor: pointer; border-radius: 60px; font-weight: bold; box-shadow: 0 0 40px #0f0; margin-top: 25px; width: 100%; text-transform: uppercase; }
-        .status { font-size: 0.8em; color: #0f0; margin-bottom: 10px; font-weight: bold; }
+        body { background: #000; color: #0f0; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 10px; margin: 0; }
+        .jarvis-box { border: 4px solid #0f0; padding: 20px; border-radius: 20px; box-shadow: 0 0 50px #0f0; display: inline-block; width: 95%; max-width: 800px; background: #050505; min-height: 90vh; }
+        #display-area { width: 100%; height: 500px; border: 2px solid #0f0; border-radius: 10px; margin-top: 20px; background: #fff; overflow: hidden; display: none; }
+        #jarvis-msg { font-size: 1.2em; color: #fff; margin: 20px 0; padding: 15px; border-bottom: 1px solid #0f0; }
+        button { background: #0f0; color: #000; border: none; padding: 20px; font-size: 1.5em; cursor: pointer; border-radius: 50px; font-weight: bold; box-shadow: 0 0 30px #0f0; width: 100%; text-transform: uppercase; }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <div class="status">HYBRID BRAIN: CONNECTED | GLOBAL SEARCH: ACTIVE</div>
-        <h1 style="text-shadow: 0 0 20px #0f0;">JARVIS v23.0</h1>
-        <div id="output">Jarvis: Sir, main taiyar hoon. Ab mere paas mera apna dimag bhi hai aur poori duniya ka internet bhi. Puchiye.</div>
-        <button onclick="startJarvis()">COMMAND MASTER</button>
+        <h1 style="text-shadow: 0 0 15px #0f0; margin-bottom: 5px;">JARVIS v24.0</h1>
+        <p style="color: #0f0; font-size: 0.8em; margin-bottom: 15px;">STATUS: REAL-TIME WORLD ACCESS ENABLED</p>
+        
+        <div id="jarvis-msg">Jarvis: Sir, maine saare filters bypass kar diye hain. Ab main seedha Google Intelligence use karunga. Puchiye.</div>
+        
+        <button onclick="startVoice()">MASTER COMMAND</button>
+
+        <div id="display-area">
+            <iframe id="search-frame" src=""></iframe>
+        </div>
     </div>
 
     <script>
-        const output = document.getElementById('output');
+        const msg = document.getElementById('jarvis-msg');
+        const frame = document.getElementById('search-frame');
+        const area = document.getElementById('display-area');
 
         function speak(text) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'hi-IN';
             window.speechSynthesis.speak(utterance);
-            output.innerText = "Jarvis: " + text;
         }
 
-        async function globalSearch(query) {
-            output.innerText = "Jarvis: Scanning global records for: " + query + "...";
-            try {
-                // Try Wikipedia first (for facts/history)
-                let wikiRes = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
-                let wikiData = await wikiRes.json();
-                
-                if (wikiData.extract) {
-                    return wikiData.extract;
-                } else {
-                    // Try DuckDuckGo (for general info)
-                    let ddgRes = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`);
-                    let ddgData = await ddgRes.json();
-                    return ddgData.AbstractText || "Sir, is sawal ka jawab mere 1000 saal ke database mein mil raha hai, lekin internet access thoda slow hai. Kya main billioniare strategy samjhaun?";
-                }
-            } catch (e) {
-                return "Sir, connection mein issue hai, lekin Taj Mahal Agra mein hai aur Stock Market ameer banne ka rasta hai.";
-            }
-        }
-
-        function startJarvis() {
+        function startVoice() {
             const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             rec.lang = 'hi-IN';
-            rec.onresult = async (e) => {
-                const transcript = e.results[0][0].transcript;
-                output.innerText = "You: " + transcript;
+            rec.onstart = () => { msg.innerText = "Jarvis: Listening Master Tabish..."; };
+            
+            rec.onresult = (e) => {
+                const query = e.results[0][0].transcript;
+                msg.innerText = "You: " + query;
                 
-                // Billionaire check
-                if (transcript.toLowerCase().includes("stock") || transcript.toLowerCase().includes("billionaire")) {
-                    speak("Stock Market ek aisa rasta hai jahan aap invest karke 19-20 saal tak billionaire ban sakte hain. Ise Compound Interest ka jadu kehte hain.");
-                } else {
-                    let result = await globalSearch(transcript);
-                    speak(result);
-                }
+                // Final Bypass Logic: Open direct Google Search inside the app
+                const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&igu=1`;
+                
+                area.style.display = "block";
+                frame.src = searchUrl;
+                
+                speak("Sir, maine " + query + " ki saari jankari nikal li hai. Aap screen par dekh sakte hain.");
             };
             rec.start();
         }
