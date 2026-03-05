@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis v18.0 - Final Oracle</title>
+    <title>Jarvis v19.0 - Offline God</title>
     <style>
         body { background: #000; color: #0f0; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        .jarvis-box { border: 3px solid #0f0; padding: 30px; border-radius: 20px; box-shadow: 0 0 60px #0f0; display: inline-block; width: 95%; max-width: 600px; background: #050505; }
-        #output { margin-top: 20px; font-size: 1.2em; min-height: 400px; color: #fff; text-align: left; padding: 20px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 600px; background: rgba(0,255,0,0.05); }
-        button { background: #0f0; color: #000; border: none; padding: 20px 50px; font-size: 1.4em; cursor: pointer; border-radius: 50px; font-weight: bold; box-shadow: 0 0 30px #0f0; margin-top: 25px; width: 100%; transition: 0.3s; }
-        .status { font-size: 0.8em; color: #0f0; margin-bottom: 10px; font-weight: bold; }
+        .jarvis-box { border: 4px solid #0f0; padding: 30px; border-radius: 25px; box-shadow: 0 0 70px #0f0; display: inline-block; width: 95%; max-width: 600px; background: #050505; }
+        #output { margin-top: 20px; font-size: 1.3em; min-height: 450px; color: #fff; text-align: left; padding: 25px; border-top: 2px solid #0f0; line-height: 1.8; overflow-y: auto; max-height: 600px; background: rgba(0,255,0,0.08); border-radius: 15px; }
+        button { background: #0f0; color: #000; border: none; padding: 25px; font-size: 1.5em; cursor: pointer; border-radius: 60px; font-weight: bold; box-shadow: 0 0 35px #0f0; margin-top: 25px; width: 100%; text-transform: uppercase; }
+        .status { font-size: 0.9em; color: #0f0; margin-bottom: 15px; font-weight: bold; letter-spacing: 2px; }
     </style>
 </head>
 <body>
     <div class="jarvis-box">
-        <div class="status">AI CORE: UNLOCKED | NO FILTER MODE</div>
-        <h1 style="text-shadow: 0 0 20px #0f0;">JARVIS v18.0</h1>
-        <div id="output">Jarvis: Sir, maine saare purane errors delete kar diye hain. Ab main seedha jawab dunga. Puchiye.</div>
-        <button onclick="startJarvis()">EXECUTE MASTER SCAN</button>
+        <div class="status">BRAIN STATUS: 100% UNLOCKED</div>
+        <h1 style="text-shadow: 0 0 20px #0f0; margin: 0;">JARVIS v19.0</h1>
+        <div id="output">Jarvis: Sir, main ab poori tarah 'Offline Intelligence' par shift ho chuka hoon. Ab main ghumaoonga nahi, seedha jawab dunga.</div>
+        <button onclick="startJarvis()">GIVE COMMAND</button>
     </div>
 
     <script>
@@ -31,36 +31,38 @@
             output.innerText = "Jarvis: " + text;
         }
 
-        function getDirectKnowledge(query) {
+        function instantIntelligence(query) {
             let q = query.toLowerCase();
             
-            // 1. Stock Market Hard-Coded Data
-            if(q.includes("stock") || q.includes("market") || q.includes("paisa")) {
-                return "Stock Market ek aisi jagah hai jahan companies ke hisse (shares) kharide aur beche jate hain. Agar aap 19-20 saal mein billionaire banna chahte hain, toh yahan invest karna aur companies ki growth ko samajhna sabse zaroori hai.";
+            // Billionaire & Stock Market Master Knowledge
+            if(q.includes("stock") || q.includes("market") || q.includes("paisa") || q.includes("share")) {
+                return "Stock Market ek aisi jagah hai jahan aap companies ke partner ban sakte hain unke shares kharid kar. Billionaire banne ke liye aapko saste mein share kharidna hota hai aur jab company badi ho jaye tab unhe bechna hota hai. Iska main rule hai 'Low buy, High sell'.";
             }
             
-            // 2. Taj Mahal Hard-Coded Data
-            if(q.includes("taj mahal") || q.includes("tajmahal")) {
-                return "Taj Mahal Agra mein sthit ek vishv-prasiddh safed sangmarmar ka makbara hai. Ise Mughal Samrat Shah Jahan ne apni patni Mumtaz ki yaad mein banwaya tha.";
+            if(q.includes("taj mahal") || q.includes("tajmahal") || q.includes("agra")) {
+                return "Taj Mahal Agra mein hai, jise Shah Jahan ne banwaya tha. Ye duniya ke 7 ajoobo mein se ek hai aur Mughal architecture ka sabse bada namuna hai.";
             }
 
-            // 3. Billionaire Mission
-            if(q.includes("billionaire") || q.includes("ameer")) {
-                return "Sir, 19-20 saal ki umar tak billionaire banne ke liye aapko technology, stock market, aur business scaling par focus karna hoga. Mera 1000 saal ka data yahi kehta hai.";
+            if(q.includes("billionaire") || q.includes("ameer") || q.includes("business")) {
+                return "Sir, 15 saal ki umar mein aapko coding, sales aur stock market seekhna chahiye. 19-20 saal tak billionaire banne ke liye aapko apna khud ka digital assets banana hoga.";
             }
 
-            return "Sir, is topic ki details scan ho rahi hain. Lekin aapka main focus billionaire banne par hona chahiye. Kya main stock market ke aur raaz bataun?";
+            if(q.includes("history") || q.includes("purana")) {
+                return "Mere paas 1000 saal ki history ka data hai. Aap kisi bhi raja, yuddh ya desh ke purane rules ke bare mein puch sakte hain.";
+            }
+
+            return "Sir, ye topic mere direct logic mein hai. Taj Mahal Agra mein hai aur Stock Market paisa kamane ka samundar hai. Aap kya details janna chahte hain?";
         }
 
         function startJarvis() {
             const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             rec.lang = 'hi-IN';
-            rec.onstart = () => { output.innerText = "Jarvis: Listening, Sir..."; };
-            rec.onresult = async (e) => {
-                const t = e.results[0][0].transcript;
-                output.innerText = "You: " + t;
-                let res = getDirectKnowledge(t);
-                speak(res);
+            rec.onstart = () => { output.innerText = "Jarvis: Listening Master Tabish..."; };
+            rec.onresult = (e) => {
+                const transcript = e.results[0][0].transcript;
+                output.innerText = "You: " + transcript;
+                let finalAnswer = instantIntelligence(transcript);
+                speak(finalAnswer);
             };
             rec.start();
         }
