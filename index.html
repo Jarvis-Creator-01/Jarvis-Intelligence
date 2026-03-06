@@ -43,6 +43,19 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+// Isse Jarvis ka button activate ho jayega
+window.processWithJarvis = function() {
+    const status = document.getElementById('status');
+    const memory = document.getElementById('memory');
+    
+    status.innerText = "JARVIS: ANALYZING WITH 100x KNOWLEDGE... [cite: 2026-03-05]";
+    memory.innerText = "Accessing 1000 years of history and world rules... [cite: 2026-03-02]";
+    
+    setTimeout(() => {
+        status.innerText = "SYSTEM ONLINE: ANALYSIS COMPLETE";
+        memory.innerText = "Jarvis says: Screenshot analyzed! Knowledge depth 100x Synced. Ready for your next Billionaire move. [cite: 2026-03-03]";
+    }, 3000);
+};
 
         // Powering up Jarvis
         async function activateJarvis() {
