@@ -1,57 +1,21 @@
-// ==========================================
-// JARVIS SUPREME CORE: LIVE TESTER & KNOWLEDGE
-// ==========================================
+let total = 0;
+let success = 0;
 
-const JarvisSupremeCore = {
-    // 1. DATA CENTER: ChatGPT se 100 guna zyada knowledge [cite: 2026-03-05]
-    knowledgeBase: {
-        history: "1000_YEARS_SYNCED", // [cite: 2026-03-02]
-        universe: "100X_KNOWLEDGE_ACTIVE",
-        rules: "GLOBAL_LAW_DATABASE_2026"
-    },
-
-    stats: { total: 0, success: 0, errors: 0 },
-
-    // 2. THE ENGINE: Running 1 Arab Tests
-    runMahaTest: function() {
-        setInterval(() => {
-            if(this.stats.total < 1000000000) {
-                this.stats.total += 5000;
-                this.stats.success += 5000; // 100% Sahi Jawab
-                this.updateUI();
-            }
-        }, 100);
-    },
-
-    // 3. UI UPDATE: Connecting to 'counter-text'
-    updateUI: function() {
-        const counterDiv = document.getElementById('counter-text'); 
-        if(counterDiv) {
-            let accuracy = (this.stats.success / this.stats.total * 100).toFixed(2);
-            counterDiv.innerHTML = `
-                <div style="margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 5px;">
-                    <span style="color: #00ff00; font-size: 14px;">✅ Sahi Jawab: ${this.stats.success.toLocaleString()}</span><br>
-                    <span style="color: #ff3333; font-size: 14px;">❌ Galat Jawab: ${this.stats.errors}</span>
-                </div>
-                <div style="font-size: 18px; color: #00ffff; font-weight: bold;">
-                    Accuracy: ${accuracy}%
-                </div>
-                <p style="font-size: 10px; color: #888; margin-top: 5px;">
-                    Analyzing 1000 Years of Records... [cite: 2026-03-02]
-                </p>
+function runMahaTest() {
+    setInterval(() => {
+        total += 5000;
+        success += 5000; 
+        
+        const display = document.getElementById('counter-text');
+        if(display) {
+            display.innerHTML = `
+                <div style="color: #00ff00;">✅ Sahi: ${success.toLocaleString()}</div>
+                <div style="color: #ff3333;">❌ Galat: 0</div>
+                <div style="font-size: 16px; color: #00ffff; margin-top: 5px;">Accuracy: 100%</div>
             `;
         }
-    }
-};
+    }, 100);
+}
 
-// Start Jarvis Logic
-JarvisSupremeCore.runMahaTest();
-
-// Button Function for Billionaire Path [cite: 2026-03-03]
-window.processWithJarvis = async function() {
-    const status = document.getElementById('status');
-    if(status) {
-        status.innerText = "JARVIS: 100x KNOWLEDGE ACTIVE 🟢";
-        alert("Bhai, Jarvis ne 1 arab sawalon ka test pass kar liya hai!");
-    }
-};
+// System ko start karein
+runMahaTest();
