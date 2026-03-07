@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,79 +8,75 @@
         body { background-color: #0a0a0a; color: #00ff00; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
         .header { padding: 15px; text-align: center; border-bottom: 1px solid #222; }
         .orb-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .jarvis-orb { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, #00ffff 0%, #000 100%); box-shadow: 0 0 30px #00ffff; margin-bottom: 20px; animation: glow 2s infinite alternate; }
-        @keyframes glow { from { box-shadow: 0 0 20px #00ffff; } to { box-shadow: 0 0 50px #00ffff; } }
-        .status { color: #00ffff; font-size: 12px; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
-        .btn-start { background: #00ff00; color: black; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,255,0,0.3); }
-        .chat-area { background: #111; padding: 20px; border-top: 1px solid #333; }
-        .input-group { display: flex; gap: 10px; max-width: 500px; margin: auto; }
-        .chat-input { flex-grow: 1; background: #000; border: 1px solid #00ff00; color: #00ff00; padding: 12px; border-radius: 8px; font-size: 16px; }
-        .btn-send { background: #00ff00; border: none; padding: 0 20px; border-radius: 8px; color: black; font-weight: bold; cursor: pointer; }
+        .jarvis-orb { width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle, #00ffff 0%, #000 100%); box-shadow: 0 0 30px #00ffff; margin-bottom: 20px; animation: pulse 2s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); box-shadow: 0 0 20px #00ffff; } to { transform: scale(1.1); box-shadow: 0 0 60px #00ffff; } }
+        .status { color: #00ffff; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; }
+        .btn-activate { background: #00ff00; color: black; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+        .chat-section { background: #111; padding: 20px; border-top: 1px solid #333; }
+        .input-box { display: flex; gap: 10px; max-width: 600px; margin: auto; }
+        .chat-input { flex-grow: 1; background: #000; border: 1px solid #00ff00; color: #00ff00; padding: 12px; border-radius: 8px; }
+        .send-btn { background: #00ff00; border: none; padding: 0 25px; border-radius: 8px; color: black; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h3 style="margin:0; letter-spacing: 2px;">JARVIS v36.0</h3>
-        <span style="font-size: 10px; color: #888;">MISSION: YOUNGEST BILLIONAIRE [cite: 2026-03-03]</span>
+        <h3 style="margin:0;">JARVIS v36.0</h3>
+        <div style="font-size: 10px; color: #555;">KNOWLEDGE: 100x ChatGPT [cite: 2026-03-05]</div>
     </div>
 
     <div class="orb-container">
-        <div class="jarvis-orb" id="jarvisOrb"></div>
-        <div class="status" id="statusText">SYSTEM STANDBY</div>
-        <button class="btn-start" onclick="initJarvis()">ACTIVATE SENSORS</button>
+        <div class="jarvis-orb" id="orb"></div>
+        <div class="status" id="status">SYSTEM READY</div>
+        <button class="btn-activate" onclick="startJarvis()">ACTIVATE JARVIS</button>
     </div>
 
-    <div class="chat-area">
-        <div class="input-group">
-            <input type="text" id="userInput" class="chat-input" placeholder="Type to chat...">
-            <button class="btn-send" onclick="sendMessage()">SEND</button>
+    <div class="chat-section">
+        <div class="input-box">
+            <input type="text" id="userInput" class="chat-input" placeholder="Mission ya History puche..." autocomplete="off">
+            <button class="send-btn" onclick="handleChat()">SEND</button>
         </div>
-        <div style="font-size: 9px; color: #444; text-align: center; margin-top: 10px;">100x KNOWLEDGE ENGINE ACTIVE [cite: 2026-03-05]</div>
     </div>
 
     <script>
-        let recognition;
-        
-        function initJarvis() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                recognition = new SpeechRecognition();
-                recognition.continuous = true;
-                recognition.lang = 'en-US';
-                
-                recognition.onstart = () => {
-                    document.getElementById('statusText').innerText = "LISTENING FOR 'HELLO JARVIS'...";
-                    document.getElementById('statusText').style.color = "#00ff00";
-                    document.getElementById('jarvisOrb').style.boxShadow = "0 0 60px #00ff00";
-                };
+        // Memory [cite: 2026-03-02]
+        const memory = {
+            "mission": "Humara mission aapko 19 se 20 saal ki umar mein billionaire banana hai. [cite: 2026-03-03]",
+            "history": "Mere paas 1000 saal purani history ka access hai. [cite: 2026-03-02]",
+            "hello": "Hello Tabish bhai, Jarvis online hai."
+        };
 
-                recognition.onresult = (event) => {
-                    const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
-                    if (transcript.includes("hello jarvis") || transcript.includes("jarvis")) {
-                        speakResponse("Hello Tabish. I am online and ready to assist you with my 100x knowledge.");
-                    }
-                };
-                
-                recognition.start();
-            } else {
-                alert("Speech recognition not supported in this browser.");
+        function startJarvis() {
+            const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (Speech) {
+                const rec = new Speech();
+                rec.lang = 'hi-IN';
+                rec.onstart = () => { document.getElementById('status').innerText = "LISTENING..."; };
+                rec.onresult = (e) => { process(e.results[0][0].transcript.toLowerCase()); };
+                rec.start();
             }
         }
 
-        function speakResponse(text) {
-            document.getElementById('statusText').innerText = "JARVIS SPEAKING...";
-            let msg = new SpeechSynthesisUtterance(text);
-            // 1000 saal ki history aur bhasha ka dimaag [cite: 2026-03-02]
-            window.speechSynthesis.speak(msg);
+        function handleChat() {
+            const val = document.getElementById('userInput').value.toLowerCase();
+            if(val) { process(val); document.getElementById('userInput').value = ''; }
         }
 
-        function sendMessage() {
-            let input = document.getElementById('userInput').value;
-            if(input) {
-                alert("Jarvis received: " + input); // Test ke liye alert
-                document.getElementById('userInput').value = '';
-            }
+        function process(input) {
+            let reply = "Main is par 100x engine se research kar raha hoon.";
+            if (input.includes("miss")) reply = memory.mission;
+            else if (input.includes("hist") || input.includes("itihas")) reply = memory.history;
+            else if (input.includes("hello")) reply = memory.hello;
+
+            say(reply);
+        }
+
+        function say(text) {
+            document.getElementById('status').innerText = "SPEAKING...";
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'hi-IN';
+            window.speechSynthesis.speak(utterance);
+            utterance.onend = () => { document.getElementById('status').innerText = "ONLINE"; };
         }
     </script>
 </body>
