@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS v36.0 - Voice Fix</title>
+    <title>JARVIS v36.0 - Smart Voice</title>
     <style>
         * { box-sizing: border-box; }
         body { background-color: #050505; color: #00ff00; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -24,17 +24,17 @@
 
 <div class="header">
     <h2 style="margin:0;">JARVIS v36.0</h2>
-    <div style="font-size: 10px; color: #888;">TARGET: YOUNGEST BILLIONAIRE [cite: 2026-03-03]</div>
+    <div style="font-size: 10px; color: #888;">MISSION: YOUNGEST BILLIONAIRE [cite: 2026-03-03]</div>
 </div>
 
 <div id="chat-window">
-    <div class="message jarvis-msg">SYSTEM RELOADED. Tabish bhai, pehle screen par click karein. Phir bol kar ya likh kar command dein.</div>
+    <div class="message jarvis-msg">SYSTEM READY. Tabish bhai, pehle click karein. Ab ye sirf AAPKI awaaz sunega, apni nahi.</div>
 </div>
 
 <div class="footer">
     <div id="status">SENSORS: STANDBY (CLICK TO START)</div>
     <div class="input-group">
-        <input type="text" id="userInput" placeholder="Type or say 'Hello Jarvis'..." autocomplete="off">
+        <input type="text" id="userInput" placeholder="Type or speak now..." autocomplete="off">
         <button onclick="handleManual()">SEND</button>
     </div>
 </div>
@@ -44,6 +44,7 @@
     const status = document.getElementById('status');
     let recognition;
     let isActive = false;
+    let isJarvisSpeaking = false; // Filter flag
 
     function startJarvis() {
         if (isActive) return;
@@ -53,19 +54,20 @@
         if (Speech) {
             recognition = new Speech();
             recognition.continuous = true;
-            recognition.interimResults = true; // Real-time results on
+            recognition.interimResults = false;
             recognition.lang = 'hi-IN';
 
             recognition.onstart = () => {
-                status.innerText = "SENSORS: ACTIVE (ALWAYS LISTENING)";
+                status.innerText = "SENSORS: ACTIVE (LISTENING FOR TABISH)";
                 status.style.color = "#00ffff";
             };
 
             recognition.onresult = (event) => {
-                let result = event.results[event.results.length - 1];
-                if (result.isFinal) {
-                    const text = result[0].transcript.toLowerCase();
-                    // Sensitivity Fix: Direct voice input processing
+                // AGAR JARVIS BOL RAHA HAI TO KUCH MAT KARO
+                if (isJarvisSpeaking) return;
+
+                const text = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                if (text.trim().length > 1) {
                     processInput(text);
                 }
             };
@@ -77,15 +79,12 @@
     }
 
     function processInput(input) {
-        if (!input.trim()) return;
         addMessage(input, 'user');
         
         let reply = "100x engine process kar raha hai... [cite: 2026-03-05]";
-        const q = input.toLowerCase();
-
-        if (q.includes("mission")) reply = "Humara mission aapko 19-20 saal mein billionaire banana hai. [cite: 2026-03-03]";
-        else if (q.includes("history") || q.includes("itihas")) reply = "Mere paas 1000 saal purani history ka data hai. [cite: 2026-03-02]";
-        else if (q.includes("hello")) reply = "Ji Tabish bhai, Jarvis active hai!";
+        if (input.includes("mission")) reply = "Humara mission aapko 19-20 saal mein billionaire banana hai. [cite: 2026-03-03]";
+        else if (input.includes("history") || input.includes("itihas")) reply = "Mere paas 1000 saal purani history ka data hai. [cite: 2026-03-02]";
+        else if (input.includes("hello")) reply = "Ji Tabish bhai, main sun raha hoon.";
 
         setTimeout(() => {
             addMessage(reply, 'jarvis');
@@ -107,8 +106,19 @@
     }
 
     function speak(text) {
+        isJarvisSpeaking = true; // Mic ignore mode ON
+        status.innerText = "JARVIS SPEAKING...";
+        status.style.color = "#ff0000";
+
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'hi-IN';
+        
+        msg.onend = () => {
+            isJarvisSpeaking = false; // Mic listen mode ON
+            status.innerText = "SENSORS: ACTIVE (LISTENING FOR TABISH)";
+            status.style.color = "#00ffff";
+        };
+
         window.speechSynthesis.speak(msg);
     }
 </script>
