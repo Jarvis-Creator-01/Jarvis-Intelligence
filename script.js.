@@ -1,16 +1,14 @@
-// Jarvis v36.0 - Advanced Brain Engine
 const statusText = document.getElementById('statusText');
 const jarvisOrb = document.getElementById('jarvisOrb');
 
-// 100x Knowledge Database [cite: 2026-03-05]
+// 100x Knowledge Memory [cite: 2026-03-05]
 const jarvisMemory = {
-    "mission": "Humara mission aapko 19 se 20 saal ki umar mein duniya ka youngest billionaire banana hai. [cite: 2026-03-03]",
-    "history": "Mere paas 1000 saal purani history aur har desh ke rules ka access hai. [cite: 2026-03-02]",
-    "who are you": "Main Jarvis v36.0 hoon, aapka personal AI assistant jiske paas ChatGPT se 100 guna zyada power hai. [cite: 2026-03-05]",
-    "hello": "Hello Tabish bhai, 100x knowledge engine active hai. Poochiye kya poochna hai?"
+    "mission": "Humara mission aapko 19 se 20 saal ki umar mein billionaire banana hai. [cite: 2026-03-03]",
+    "history": "Mere paas 1000 saal purani history ka poora data hai. [cite: 2026-03-02]",
+    "kaise ho": "Main bilkul theek hoon Tabish bhai, aapka 100x engine ready hai.",
+    "hello": "Hello Tabish bhai, Jarvis online hai. Poochiye kya poochna hai?"
 };
 
-// Voice Recognition Setup
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition;
 
@@ -18,55 +16,53 @@ function initJarvis() {
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.continuous = true;
-        recognition.lang = 'en-US';
+        recognition.lang = 'hi-IN'; // Hindi samajhne ke liye
 
         recognition.onstart = () => {
-            statusText.innerText = "LISTENING FOR 'HELLO JARVIS'...";
+            statusText.innerText = "LISTENING...";
             statusText.style.color = "#00ff00";
         };
 
         recognition.onresult = (event) => {
             const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
-            if (transcript.includes("hello jarvis") || transcript.includes("jarvis")) {
-                processCommand("hello");
-            }
+            console.log("User said: " + transcript);
+            processInput(transcript);
         };
         recognition.start();
     }
 }
 
-// Answer Logic
-function processCommand(input) {
+function processInput(input) {
     let response = "Main is par research kar raha hoon apne 100x engine se.";
     
-    // Check Memory [cite: 2026-03-02]
-    for (let key in jarvisMemory) {
-        if (input.includes(key)) {
-            response = jarvisMemory[key];
-        }
-    }
-    
+    // Memory se match karna [cite: 2026-03-02]
+    if (input.includes("mission")) response = jarvisMemory["mission"];
+    else if (input.includes("history")) response = jarvisMemory["history"];
+    else if (input.includes("kaise ho")) response = jarvisMemory["kaise ho"];
+    else if (input.includes("hello") || input.includes("jarvis")) response = jarvisMemory["hello"];
+
     speakResponse(response);
 }
 
 function speakResponse(text) {
     statusText.innerText = "JARVIS SPEAKING...";
-    jarvisOrb.style.boxShadow = "0 0 80px #ff00ff";
-    let msg = new SpeechSynthesisUtterance(text);
-    window.speechSynthesis.speak(msg);
+    jarvisOrb.style.boxShadow = "0 0 70px #ff00ff";
     
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'hi-IN'; // Hindi mein bolne ke liye
+    window.speechSynthesis.speak(msg);
+
     msg.onend = () => {
         statusText.innerText = "LISTENING...";
         jarvisOrb.style.boxShadow = "0 0 30px #00ffff";
     };
 }
 
-// Chat Send Button Logic
 function sendMessage() {
     const inputField = document.getElementById('userInput');
     const message = inputField.value.toLowerCase();
     if (message) {
-        processCommand(message);
+        processInput(message);
         inputField.value = '';
     }
 }
