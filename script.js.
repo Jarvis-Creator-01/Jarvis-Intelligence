@@ -1,15 +1,41 @@
-let success = 0;
-function startJarvisEngine() {
-    setInterval(() => {
-        success += 5000;
-        const display = document.getElementById('counter-text');
-        if(display) {
-            display.innerHTML = `
-                <div style="color: #00ff00; font-weight: bold; font-size: 20px;">✅ Sahi: ${success.toLocaleString()}</div>
-                <div style="color: #ff3333; font-weight: bold; font-size: 20px;">❌ Galat: 0</div>
-                <div style="font-size: 14px; color: #00ffff; margin-top: 10px; border-top: 1px solid #444;">Accuracy: 100%</div>
-            `;
+const statusText = document.getElementById('statusText');
+const jarvisOrb = document.getElementById('jarvisOrb');
+
+// Voice Recognition Setup
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
+        
+        // Wake Word Detection: "Hello Jarvis"
+        if (transcript.includes("hello jarvis") || transcript.includes("jarvis")) {
+            activateJarvis();
         }
-    }, 100);
+    };
+
+    recognition.start();
 }
-startJarvisEngine();
+
+function activateJarvis() {
+    statusText.innerText = "ONLINE & LISTENING...";
+    jarvisOrb.style.boxShadow = "0 0 80px #ff00ff"; // Orb changes color when active
+    statusText.style.color = "#ff00ff";
+    
+    // Yahan hum aage response system add karenge
+    let msg = new SpeechSynthesisUtterance("Hello Tabish. I am online with 100x knowledge. How can I help you?");
+    window.speechSynthesis.speak(msg);
+}
+
+// Chat Input Logic (ChatGPT Style)
+document.getElementById('userInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        let input = this.value;
+        this.value = '';
+        console.log("User wants to chat: " + input);
+        // Jarvis response logic yahan aayega
+    }
+});
