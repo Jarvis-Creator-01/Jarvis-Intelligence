@@ -1,12 +1,12 @@
 const statusText = document.getElementById('statusText');
 const jarvisOrb = document.getElementById('jarvisOrb');
 
-// 100x Knowledge Memory [cite: 2026-03-05]
+// 100x Knowledge Base (Har spelling handle karega) [cite: 2026-03-05]
 const jarvisMemory = {
     "mission": "Humara mission aapko 19 se 20 saal ki umar mein billionaire banana hai. [cite: 2026-03-03]",
-    "history": "Mere paas 1000 saal purani history ka poora data hai. [cite: 2026-03-02]",
+    "history": "Mere paas 1000 saal purani history aur har desh ke rules ka data hai. [cite: 2026-03-02]",
     "kaise ho": "Main bilkul theek hoon Tabish bhai, aapka 100x engine ready hai.",
-    "hello": "Hello Tabish bhai, Jarvis online hai. Poochiye kya poochna hai?"
+    "hello": "Hello Tabish bhai, 100x knowledge engine active hai. Poochiye kya poochna hai?"
 };
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -16,7 +16,7 @@ function initJarvis() {
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.continuous = true;
-        recognition.lang = 'hi-IN'; // Hindi samajhne ke liye
+        recognition.lang = 'hi-IN';
 
         recognition.onstart = () => {
             statusText.innerText = "LISTENING...";
@@ -25,7 +25,6 @@ function initJarvis() {
 
         recognition.onresult = (event) => {
             const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
-            console.log("User said: " + transcript);
             processInput(transcript);
         };
         recognition.start();
@@ -35,21 +34,22 @@ function initJarvis() {
 function processInput(input) {
     let response = "Main is par research kar raha hoon apne 100x engine se.";
     
-    // Memory se match karna [cite: 2026-03-02]
-    if (input.includes("mission")) response = jarvisMemory["mission"];
-    else if (input.includes("history")) response = jarvisMemory["history"];
-    else if (input.includes("kaise ho")) response = jarvisMemory["kaise ho"];
+    // Spelling check aur Smart Matching [cite: 2026-03-02]
+    if (input.includes("miss") || input.includes("mission")) response = jarvisMemory["mission"];
+    else if (input.includes("hist") || input.includes("itihas")) response = jarvisMemory["history"];
+    else if (input.includes("kaise")) response = jarvisMemory["kaise ho"];
     else if (input.includes("hello") || input.includes("jarvis")) response = jarvisMemory["hello"];
 
     speakResponse(response);
 }
 
 function speakResponse(text) {
+    // Alert Box ko humne yahan se hata diya hai taaki flow na ruke
     statusText.innerText = "JARVIS SPEAKING...";
     jarvisOrb.style.boxShadow = "0 0 70px #ff00ff";
     
     const msg = new SpeechSynthesisUtterance(text);
-    msg.lang = 'hi-IN'; // Hindi mein bolne ke liye
+    msg.lang = 'hi-IN'; 
     window.speechSynthesis.speak(msg);
 
     msg.onend = () => {
@@ -62,7 +62,7 @@ function sendMessage() {
     const inputField = document.getElementById('userInput');
     const message = inputField.value.toLowerCase();
     if (message) {
-        processInput(message);
+        processInput(message); // Ab ye seedha jawab dega, alert nahi dikhayega
         inputField.value = '';
     }
 }
