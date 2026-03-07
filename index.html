@@ -5,34 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JARVIS v36.0</title>
     <style>
-        body { background-color: #0a0a0a; color: #00ff00; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { padding: 20px; text-align: center; border-bottom: 1px solid #1a1a1a; }
-        .orb-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
-        .jarvis-orb { width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, #00ffff 0%, #008080 50%, #000 100%); box-shadow: 0 0 50px #00ffff; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
-        .status-text { position: absolute; bottom: 20px; font-size: 14px; color: #00ffff; letter-spacing: 2px; }
-        .chat-container { height: 150px; background: #111; padding: 15px; border-top: 1px solid #333; display: flex; flex-direction: column; }
-        .chat-input { background: #000; border: 1px solid #00ff00; color: #00ff00; padding: 12px; border-radius: 5px; outline: none; width: 90%; margin: 0 auto; }
-        .vision-tag { font-size: 10px; color: #555; text-align: center; margin-top: 5px; }
+        body { background-color: #0a0a0a; color: #00ff00; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .header { padding: 15px; text-align: center; border-bottom: 1px solid #222; }
+        .orb-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .jarvis-orb { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, #00ffff 0%, #000 100%); box-shadow: 0 0 30px #00ffff; margin-bottom: 20px; animation: glow 2s infinite alternate; }
+        @keyframes glow { from { box-shadow: 0 0 20px #00ffff; } to { box-shadow: 0 0 50px #00ffff; } }
+        .status { color: #00ffff; font-size: 12px; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
+        .btn-start { background: #00ff00; color: black; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,255,0,0.3); }
+        .chat-area { background: #111; padding: 20px; border-top: 1px solid #333; }
+        .input-group { display: flex; gap: 10px; max-width: 500px; margin: auto; }
+        .chat-input { flex-grow: 1; background: #000; border: 1px solid #00ff00; color: #00ff00; padding: 12px; border-radius: 8px; font-size: 16px; }
+        .btn-send { background: #00ff00; border: none; padding: 0 20px; border-radius: 8px; color: black; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="margin:0; letter-spacing: 3px;">JARVIS v36.0</h2>
-        <div style="font-size: 10px; color: #888;">100x KNOWLEDGE SYNCED [cite: 2026-03-05]</div>
+        <h3 style="margin:0; letter-spacing: 2px;">JARVIS v36.0</h3>
+        <span style="font-size: 10px; color: #888;">MISSION: YOUNGEST BILLIONAIRE [cite: 2026-03-03]</span>
     </div>
 
     <div class="orb-container">
         <div class="jarvis-orb" id="jarvisOrb"></div>
-        <div class="status-text" id="statusText">SAY "HELLO JARVIS" TO START</div>
+        <div class="status" id="statusText">SYSTEM STANDBY</div>
+        <button class="btn-start" onclick="initJarvis()">ACTIVATE SENSORS</button>
     </div>
 
-    <div class="chat-container">
-        <input type="text" class="chat-input" placeholder="Chat with Jarvis..." id="userInput">
-        <div class="vision-tag">Target: Youngest Billionaire (19-20) [cite: 2026-03-03]</div>
+    <div class="chat-area">
+        <div class="input-group">
+            <input type="text" id="userInput" class="chat-input" placeholder="Type to chat...">
+            <button class="btn-send" onclick="sendMessage()">SEND</button>
+        </div>
+        <div style="font-size: 9px; color: #444; text-align: center; margin-top: 10px;">100x KNOWLEDGE ENGINE ACTIVE [cite: 2026-03-05]</div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        let recognition;
+        
+        function initJarvis() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.lang = 'en-US';
+                
+                recognition.onstart = () => {
+                    document.getElementById('statusText').innerText = "LISTENING FOR 'HELLO JARVIS'...";
+                    document.getElementById('statusText').style.color = "#00ff00";
+                    document.getElementById('jarvisOrb').style.boxShadow = "0 0 60px #00ff00";
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                    if (transcript.includes("hello jarvis") || transcript.includes("jarvis")) {
+                        speakResponse("Hello Tabish. I am online and ready to assist you with my 100x knowledge.");
+                    }
+                };
+                
+                recognition.start();
+            } else {
+                alert("Speech recognition not supported in this browser.");
+            }
+        }
+
+        function speakResponse(text) {
+            document.getElementById('statusText').innerText = "JARVIS SPEAKING...";
+            let msg = new SpeechSynthesisUtterance(text);
+            // 1000 saal ki history aur bhasha ka dimaag [cite: 2026-03-02]
+            window.speechSynthesis.speak(msg);
+        }
+
+        function sendMessage() {
+            let input = document.getElementById('userInput').value;
+            if(input) {
+                alert("Jarvis received: " + input); // Test ke liye alert
+                document.getElementById('userInput').value = '';
+            }
+        }
+    </script>
 </body>
 </html>
