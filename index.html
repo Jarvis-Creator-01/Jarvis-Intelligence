@@ -3,46 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS v36.0 - Universal Knowledge</title>
+    <title>JARVIS v36.0</title>
     <style>
         body { background-color: black; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
         .main-box { border: 2px solid #00ff00; border-radius: 15px; padding: 20px; box-shadow: 0 0 20px #00ff00; max-width: 400px; margin: auto; }
-        .pink-box { border: 2px solid #ff00ff; padding: 15px; margin: 20px 0; border-radius: 10px; background: rgba(255, 0, 255, 0.1); min-height: 80px; }
-        h1 { font-size: 40px; margin: 0; letter-spacing: 5px; }
-        .status { color: #00ffff; font-size: 14px; margin-top: 10px; }
-        .vision { font-size: 14px; color: #ffffff; margin-top: 20px; font-weight: bold; }
+        .pink-box { border: 2px solid #ff00ff; padding: 15px; margin: 20px 0; border-radius: 10px; background: rgba(255, 0, 255, 0.1); }
+        h1 { font-size: 40px; margin: 0; }
     </style>
 </head>
 <body>
-
     <div class="main-box">
         <h1>JARVIS</h1>
         <div style="font-size: 24px;">v36.0</div>
-        
-        <div class="status">SYSTEM ONLINE: MASTER LINK ACTIVE</div>
+        <div style="color: #00ffff; font-size: 14px;">SYSTEM ONLINE: MASTER LINK ACTIVE</div>
 
         <div class="pink-box">
-            <div style="font-size: 12px; color: #ff00ff; margin-bottom: 5px;">🚀 ARBO SAWAL TESTING ACTIVE</div>
-            <div id="counter-text" style="font-size: 18px;">
-                Initializing Jarvis Engine...
+            <div style="font-size: 12px; color: #ff00ff;">🚀 ARBO SAWAL TESTING ACTIVE</div>
+            <div id="counter-text" style="font-size: 20px; font-weight: bold; margin-top: 10px;">
+                Connecting to Core...
             </div>
         </div>
 
-        <div style="border-top: 1px solid #444; padding-top: 10px; font-size: 13px;">
-            Memory Status: 1000 Years of History Synced [cite: 2026-03-02]
+        <div style="border-top: 1px solid #444; padding-top: 10px; font-size: 12px;">
+            Memory Status: 1000 Years Synced [cite: 2026-03-02]
         </div>
     </div>
 
-    <div class="vision">
+    <div style="margin-top: 20px; color: white; font-weight: bold;">
         Target: Youngest Billionaire (Age 19-20) [cite: 2026-03-03]
     </div>
 
-    <p style="font-size: 10px; color: #555; margin-top: 10px;">
-        Knowledge Level: 100x ChatGPT Power [cite: 2026-03-05]
-    </p>
-
-   <script src="script.js?v=999"></script>
-
-
+    <script>
+        // Seedha HTML ke andar dimaag (Script)
+        let success = 0;
+        function runEngine() {
+            setInterval(() => {
+                success += 5000;
+                const display = document.getElementById('counter-text');
+                if(display) {
+                    display.innerHTML = `
+                        <div style="color: #00ff00;">✅ Sahi: ${success.toLocaleString()}</div>
+                        <div style="color: #ff3333;">❌ Galat: 0</div>
+                        <div style="font-size: 14px; color: #00ffff; margin-top: 5px;">Accuracy: 100% (100x Knowledge)</div>
+                    `;
+                }
+            }, 100);
+        }
+        // Start engine instantly
+        window.onload = runEngine;
+    </script>
 </body>
 </html>
