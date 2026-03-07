@@ -98,28 +98,7 @@ window.processWithJarvis = async function() {
     };
     reader.readAsDataURL(file);
 };
+        <script src="script.js"></script>
 
-        // Powering up Jarvis
-        async function activateJarvis() {
-            try {
-                // Setting up 1000-year history and world rules access [cite: 2026-03-02]
-                await setDoc(doc(db, "system", "status"), {
-                    intelligence: "Global",
-                    history_access: "1000_Years",
-                    languages: "All_World_Languages",
-                    billionaire_path: "Active"
-                });
-                
-                document.getElementById('status').innerText = "SYSTEM ONLINE: MASTER LINK ACTIVE";
-                document.getElementById('memory').innerText = "Memory Status: 1000 Years of History Synced.";
-                console.log("Jarvis: Sir, I am ready to build the future.");
-            } catch (e) {
-                console.error("Setup Error:", e);
-                document.getElementById('status').innerText = "CONNECTION ERROR: Check Database Rules";
-            }
-        }
-
-        activateJarvis();
-    </script>
 </body>
 </html>
