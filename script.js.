@@ -3,10 +3,7 @@ let success = 0;
 function startJarvisEngine() {
     setInterval(() => {
         success += 5000;
-        
-        // Yeh line seedha "Initializing..." waale text ko badal degi
         const display = document.getElementById('counter-text');
-        
         if(display) {
             display.innerHTML = `
                 <div style="color: #00ff00; font-weight: bold; font-size: 20px;">✅ Sahi: ${success.toLocaleString()}</div>
@@ -17,5 +14,5 @@ function startJarvisEngine() {
     }, 100);
 }
 
-// Engine start karne ki sahi command
+// Ye command zaruri hai engine start karne ke liye
 startJarvisEngine();
