@@ -1,28 +1,21 @@
-let total = 0;
 let success = 0;
 
-function runMahaTest() {
+function startJarvisEngine() {
     setInterval(() => {
-        total += 5000;
-        success += 5000; // Jarvis 100% Sahi Jawab [cite: 2026-03-05]
+        success += 5000;
         
-        // DHAYN DEIN: Hum dono IDs ko update karenge taaki error na aaye
-        const counterBox = document.getElementById('counter-text');
-        const statusText = document.getElementById('status');
+        // Yeh line seedha "Initializing..." waale text ko badal degi
+        const display = document.getElementById('counter-text');
         
-        if(counterBox) {
-            counterBox.innerHTML = `
-                <div style="color: #00ff00;">✅ Sahi: ${success.toLocaleString()}</div>
-                <div style="color: #ff3333;">❌ Galat: 0</div>
-                <div style="font-size: 16px; color: #00ffff; margin-top: 5px;">Accuracy: 100%</div>
+        if(display) {
+            display.innerHTML = `
+                <div style="color: #00ff00; font-weight: bold; font-size: 20px;">✅ Sahi: ${success.toLocaleString()}</div>
+                <div style="color: #ff3333; font-weight: bold; font-size: 20px;">❌ Galat: 0</div>
+                <div style="font-size: 14px; color: #00ffff; margin-top: 10px; border-top: 1px solid #444;">Accuracy: 100%</div>
             `;
-        }
-        
-        if(statusText) {
-            statusText.innerText = "JARVIS: TESTING " + total.toLocaleString() + " QUESTIONS...";
         }
     }, 100);
 }
 
-// System Activation
-runMahaTest();
+// Engine start karne ki sahi command
+startJarvisEngine();
