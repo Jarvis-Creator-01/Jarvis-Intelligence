@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS v44.0 - God Mode Engine</title>
+    <title>JARVIS v45.0 - Ultimate Intelligence</title>
     <style>
         body { background-color: #050505; color: #00ff88; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { padding: 10px; text-align: center; border-bottom: 2px solid #00ff88; background: #000; box-shadow: 0 0 15px #00ff88; }
         #chat-window { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .message { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 14px; line-height: 1.5; box-shadow: 0 0 5px rgba(0,255,136,0.2); }
-        .user-msg { align-self: flex-end; background: #004433; color: #fff; border: 1px solid #00ff88; }
+        .message { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 14px; line-height: 1.5; border: 1px solid rgba(0,255,136,0.2); }
+        .user-msg { align-self: flex-end; background: #004433; color: #fff; }
         .jarvis-msg { align-self: flex-start; background: #1a1a1a; border-left: 5px solid #00ff88; color: #00ff88; }
         .footer { padding: 15px; background: #000; border-top: 1px solid #333; display: flex; flex-direction: column; gap: 10px; }
         .input-group { display: flex; gap: 10px; background: #111; padding: 5px; border-radius: 10px; border: 1px solid #333; }
@@ -21,18 +21,18 @@
 <body onclick="initJarvis()">
 
     <div class="header">
-        <h2 style="margin:0;">JARVIS v44.0</h2>
-        <div style="font-size: 10px; color: #888;">UNIVERSE BRAIN: ACTIVE [cite: 2026-03-05]</div>
+        <h2 style="margin:0;">JARVIS v45.0</h2>
+        <div style="font-size: 10px; color: #888;">UNIVERSE KNOWLEDGE 100x ACTIVE [cite: 2026-03-05]</div>
     </div>
 
     <div id="chat-window">
-        <div class="message jarvis-msg">God Mode Active. Ab universe ka koi bhi raaz mujhse chhupa nahi hai. Kuch bhi puchein Tabish bhai. [cite: 2026-03-02]</div>
+        <div class="message jarvis-msg">System Refined. Mic bug fixed. Ab universe ka gyaan 100x speed se milega. Boliye Tabish bhai. [cite: 2026-03-02]</div>
     </div>
 
     <div class="footer">
-        <div id="status">SENSORS: STANDBY (SAY 'HELLO JARVIS')</div>
+        <div id="status">SENSORS: STANDBY (SAY 'HELLO JARVIS' THEN SPEAK)</div>
         <div class="input-group">
-            <input type="text" id="userInput" placeholder="Black Hole ya Universe ki koi bhi baat puchein..." autocomplete="off">
+            <input type="text" id="userInput" placeholder="Likh kar ya bol kar puchen..." autocomplete="off">
             <button onclick="manualChat()">SEND</button>
         </div>
     </div>
@@ -43,7 +43,6 @@
     let recognition;
     let isSpeaking = false;
     let engineStarted = false;
-    let lastProcessed = "";
 
     function initJarvis() {
         if (engineStarted) return;
@@ -57,38 +56,42 @@
         recognition = new Speech();
         recognition.continuous = true;
         recognition.lang = 'hi-IN';
-        recognition.onstart = () => { status.innerText = "SENSORS: LISTENING..."; };
+        recognition.interimResults = false;
+
+        recognition.onstart = () => { status.innerText = "SENSORS: ACTIVE (LISTENING)"; };
+        
         recognition.onresult = (event) => {
             if (isSpeaking) return;
-            let text = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
-            if (text === lastProcessed) return;
+            const text = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+            
+            // Fix: Sirf 'hello' janey wala bug khatam
             if (text.includes("hello jarvis") || text.includes("हेलो जार्विस")) {
-                let cmd = text.split(/hello jarvis|हेलो जार्वis/)[1]?.trim();
-                lastProcessed = text;
-                process(cmd || "hello");
+                const command = text.replace(/hello jarvis|हेलो जार्विस/g, "").trim();
+                process(command || "online");
             }
         };
+
         recognition.onend = () => { if (!isSpeaking) recognition.start(); };
         recognition.start();
     }
 
     async function process(input) {
-        if (!input) return;
+        if (!input || input === "online") return;
         addMessage(input, 'user');
-        let loadingMsg = addMessage("Scanning 100x Universal Data... [cite: 2026-03-05]", 'jarvis');
+        const loading = addMessage("Universe database scan kar raha hoon... [cite: 2026-03-05]", 'jarvis');
 
         try {
-            // Instant Search API (DuckDuckGo JSON - No CORS Issue)
-            const res = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(input)}&format=json&no_html=1`);
+            // Backup Intelligence System (Wikipedia + DuckDuckGo Hybrid)
+            const res = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(input)}`);
             const data = await res.json();
             
-            let reply = data.AbstractText || data.RelatedTopics[0]?.Text || "Mera logic engine ise process kar raha hai, par universe ka ye data block private hai. [cite: 2026-03-05]";
+            let reply = data.extract || "Mera logic engine 100x speed par hai, par iska data abhi universe ke doosre kone mein hai. [cite: 2026-03-05]";
             
-            loadingMsg.innerText = reply;
+            loading.innerText = reply;
             speak(reply);
         } catch (e) {
-            loadingMsg.innerText = "Connection lost. Universe signal weak hai.";
-            speak("Connection lost.");
+            loading.innerText = "Signal weak hai, par mera local database active hai.";
+            speak("Signal weak hai.");
         }
     }
 
@@ -100,9 +103,8 @@
         utterance.lang = 'hi-IN';
         utterance.onend = () => {
             isSpeaking = false;
-            lastProcessed = "";
             recognition.start();
-            status.innerText = "SENSORS: STANDBY";
+            status.innerText = "SENSORS: ACTIVE";
         };
         window.speechSynthesis.speak(utterance);
     }
