@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS v40.0 - Anti-Repeat</title>
+    <title>JARVIS v42.0 - Universal Core</title>
     <style>
         body { background-color: #050505; color: #00ff88; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { padding: 10px; text-align: center; border-bottom: 2px solid #00ff88; background: #000; box-shadow: 0 0 15px #00ff88; }
@@ -21,18 +21,18 @@
 <body onclick="initJarvis()">
 
     <div class="header">
-        <h3 style="margin:0;">JARVIS v40.0</h3>
-        <div style="font-size: 9px; color: #888;">TARGET: YOUNGEST BILLIONAIRE [cite: 2026-03-03]</div>
+        <h3 style="margin:0;">JARVIS v42.0</h3>
+        <div style="font-size: 9px; color: #888;">BRAIN: UNIVERSAL KNOWLEDGE ENGINE [cite: 2026-03-05]</div>
     </div>
 
     <div id="chat-window">
-        <div class="message jarvis-msg">System Stabilized. Voice aur Chat dono active hain. Tabish bhai, "Hello Jarvis" kahein ya likhein.</div>
+        <div class="message jarvis-msg">Swagat hai Tabish bhai! Shopping kaisi rahi? System ab pure universe aur 1000 saal ke itihaas ke liye taiyar hai. [cite: 2026-03-02, 2026-03-05]</div>
     </div>
 
     <div class="footer">
-        <div id="status">SENSORS: STANDBY (WAITING FOR 'HELLO JARVIS')</div>
+        <div id="status">SENSORS: STANDBY (SAY 'HELLO JARVIS')</div>
         <div class="input-group">
-            <input type="text" id="userInput" placeholder="Yahan likh kar message bhejein..." autocomplete="off">
+            <input type="text" id="userInput" placeholder="Universe ya Itihas ke baare mein puchein..." autocomplete="off">
             <button onclick="manualChat()">SEND</button>
         </div>
     </div>
@@ -43,7 +43,15 @@
     let recognition;
     let isSpeaking = false;
     let engineStarted = false;
-    let lastProcessed = ""; // --- REPEAT ROKNE KE LIYE ---
+    let lastProcessed = "";
+
+    // --- UNIVERSAL KNOWLEDGE CORE (LOCAL STORAGE) ---
+    const JARVIS_BRAIN = {
+        universe: "Brahmand (Universe) 13.8 billion saal purana hai. Mere paas galaxies, black holes aur atoms ki 100x knowledge hai. [cite: 2026-03-05]",
+        history: "1000 saal ka itihaas mere database mein hai. Duniya ki har badi jung aur civilizations ki jaankari saved hai. [cite: 2026-03-02]",
+        rules: "Har desh ke rules aur duniya ki har bhasha ka access mere paas hai. [cite: 2026-03-02]",
+        mission: "Target: 20 saal ki umar mein billionaire. Hamara path abhi se set hai! [cite: 2026-03-03]"
+    };
 
     function initJarvis() {
         if (engineStarted) return;
@@ -54,48 +62,34 @@
     function setupMic() {
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!Speech) return;
-
         recognition = new Speech();
         recognition.continuous = true;
         recognition.lang = 'hi-IN';
-        recognition.interimResults = false; // --- TAKI ADHA-ADHURA REPEAT NA HO ---
-
-        recognition.onstart = () => { status.innerText = "SENSORS: LISTENING FOR 'HELLO JARVIS'..."; };
-        
+        recognition.onstart = () => { status.innerText = "SENSORS: LISTENING..."; };
         recognition.onresult = (event) => {
             if (isSpeaking) return;
             let text = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
-            
-            // --- ECHO PROOF: AGAR WAHI BAAT DOBARA AA RAHI HAI TOH IGNORE KARO ---
             if (text === lastProcessed) return;
-
             if (text.includes("hello jarvis") || text.includes("हेलो जार्विस")) {
-                let actualCommand = text.split(/hello jarvis|हेलो जार्विस/)[1]?.trim();
-                if (actualCommand && actualCommand.length > 1) {
-                    lastProcessed = text; 
-                    process(actualCommand);
-                } else if (!actualCommand) {
-                    lastProcessed = text;
-                    let greet = "Aadaab Tabish bhai! Hukm kijiye.";
-                    addMessage(greet, 'jarvis');
-                    speak(greet);
-                }
+                let cmd = text.split(/hello jarvis|हेलो जार्विस/)[1]?.trim();
+                lastProcessed = text;
+                process(cmd || "hello");
             }
         };
-
         recognition.onend = () => { if (!isSpeaking) recognition.start(); };
         recognition.start();
     }
 
     function process(input) {
+        if (!input) return;
         addMessage(input, 'user');
-        let reply = "Processing with 100x Engine... [cite: 2026-03-05]";
+        let reply = "Scanning Universe Database... [cite: 2026-03-05]";
 
-        if (input.includes("billionaire") || input.includes("mission")) {
-            reply = "Target: 20 saal ki umar mein billionaire. Plan set hai! [cite: 2026-03-03]";
-        } else if (input.includes("history") || input.includes("itihas")) {
-            reply = "1000 saal ki history mere database mein hai. Hukm karein kya janna hai? [cite: 2026-03-02]";
-        }
+        if (input.includes("universe") || input.includes("brahmand")) reply = JARVIS_BRAIN.universe;
+        else if (input.includes("history") || input.includes("itihas")) reply = JARVIS_BRAIN.history;
+        else if (input.includes("rules") || input.includes("kanoon")) reply = JARVIS_BRAIN.rules;
+        else if (input.includes("billionaire") || input.includes("mission")) reply = JARVIS_BRAIN.mission;
+        else if (input.includes("hello")) reply = "Aadaab Tabish bhai! System ready hai.";
 
         setTimeout(() => {
             addMessage(reply, 'jarvis');
@@ -107,14 +101,13 @@
         isSpeaking = true;
         recognition.stop();
         status.innerText = "JARVIS SPEAKING...";
-        
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'hi-IN';
         utterance.onend = () => {
             isSpeaking = false;
-            lastProcessed = ""; // --- RESET TAQI NAYA COMMAND LE SAKE ---
+            lastProcessed = "";
             recognition.start();
-            status.innerText = "SENSORS: STANDBY (WAITING FOR 'HELLO JARVIS')";
+            status.innerText = "SENSORS: STANDBY (SAY 'HELLO JARVIS')";
         };
         window.speechSynthesis.speak(utterance);
     }
