@@ -3,31 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS v38.0 - Standby Mode</title>
+    <title>JARVIS v39.0 - Dual Master</title>
     <style>
         body { background-color: #050505; color: #00ff88; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { padding: 10px; text-align: center; border-bottom: 2px solid #00ff88; background: #000; box-shadow: 0 0 15px #00ff88; }
         #chat-window { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .message { padding: 12px 18px; border-radius: 15px; max-width: 80%; font-size: 14px; }
+        .message { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 14px; }
         .user-msg { align-self: flex-end; background: #004433; color: #fff; border: 1px solid #00ff88; }
         .jarvis-msg { align-self: flex-start; background: #1a1a1a; border-left: 5px solid #00ff88; color: #00ff88; }
-        .footer { padding: 10px; background: #000; border-top: 1px solid #333; }
-        #status { font-size: 10px; color: #888; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+        .footer { padding: 15px; background: #000; border-top: 1px solid #333; display: flex; flex-direction: column; gap: 10px; }
+        .input-group { display: flex; gap: 10px; }
+        input { flex-grow: 1; background: #000; border: 2px solid #00ff88; color: white; padding: 10px; border-radius: 8px; outline: none; }
+        button { background: #00ff88; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        #status { font-size: 10px; color: #888; text-align: center; text-transform: uppercase; }
     </style>
 </head>
 <body onclick="initJarvis()">
 
     <div class="header">
-        <h3 style="margin:0;">JARVIS v38.0</h3>
-        <div style="font-size: 9px; color: #888;">STATUS: STANDBY MODE [cite: 2026-03-02]</div>
+        <h3 style="margin:0;">JARVIS v39.0</h3>
+        <div style="font-size: 9px; color: #888;">DUAL MODE: VOICE + CHAT [cite: 2026-03-02]</div>
     </div>
 
     <div id="chat-window">
-        <div class="message jarvis-msg">Main Standby par hoon. Jab tak aap "Hello Jarvis" nahi bolenge, main kuch nahi sununga.</div>
+        <div class="message jarvis-msg">Main Standby par hoon. "Hello Jarvis" kahein ya niche message likhein.</div>
     </div>
 
     <div class="footer">
-        <div id="status">SENSORS: OFF (CLICK TO ENABLE)</div>
+        <div id="status">SENSORS: OFF (CLICK SCREEN TO START)</div>
+        <div class="input-group">
+            <input type="text" id="userInput" placeholder="Yahan likhein..." autocomplete="off">
+            <button onclick="manualChat()">SEND</button>
+        </div>
     </div>
 
 <script>
@@ -50,27 +57,26 @@
         recognition = new Speech();
         recognition.continuous = true;
         recognition.lang = 'hi-IN';
-        recognition.interimResults = false;
+        recognition.interimResults = true; // --- TEZI SE SUNNE KE LIYE ---
 
-        recognition.onstart = () => { status.innerText = "SENSORS: STANDBY (WAITING FOR 'HELLO JARVIS')"; };
+        recognition.onstart = () => { status.innerText = "LISTENING FOR 'HELLO JARVIS'..."; };
         
         recognition.onresult = (event) => {
             if (isSpeaking) return;
-            const text = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+            let text = "";
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                text += event.results[i][0].transcript;
+            }
+            text = text.toLowerCase().trim();
             
-            // --- WAKE WORD DETECTION (SIRF HELLO JARVIS PAR CHALEGA) ---
+            // --- WAKE WORD DETECTION ---
             if (text.includes("hello jarvis") || text.includes("हेलो जार्विस")) {
-                let actualCommand = text.replace("hello jarvis", "").replace("हेलो जार्विस", "").trim();
-                
-                if (actualCommand.length > 1) {
+                let actualCommand = text.split(/hello jarvis|हेलो जार्विस/)[1]?.trim();
+                if (actualCommand && actualCommand.length > 1) {
                     process(actualCommand);
-                } else {
-                    let greeting = "Aadaab Tabish bhai! Hukm kijiye."; [cite: 2026-03-02]
-                    addMessage(greeting, 'jarvis');
-                    speak(greeting);
+                    recognition.stop(); // Stop to avoid double processing
                 }
             }
-            // Agar "Hello Jarvis" nahi hai, toh system kuch nahi karega (Silence)
         };
 
         recognition.onend = () => { if (!isSpeaking) recognition.start(); };
@@ -79,12 +85,14 @@
 
     function process(input) {
         addMessage(input, 'user');
-        let reply = "100x engine process kar raha hai... [cite: 2026-03-05]";
+        let reply = "Processing with 100x Engine... [cite: 2026-03-05]";
 
         if (input.includes("billionaire") || input.includes("mission")) {
-            reply = "Target: 20 saal ki umar mein billionaire. Hamara rasta ekdam saaf hai! [cite: 2026-03-03]";
-        } else if (input.includes("itihas") || input.includes("history")) {
-            reply = "1000 saal ki history mere database mein hai. Hukm karein kya janna hai? [cite: 2026-03-02]";
+            reply = "Billionaire Target: 19-20 saal ki umar tak. Hum taiyar hain! [cite: 2026-03-03]";
+        } else if (input.includes("history") || input.includes("itihas")) {
+            reply = "1000 saal ki history mere database mein load hai. [cite: 2026-03-02]";
+        } else if (input.includes("hello")) {
+            reply = "Aadaab Tabish bhai! [cite: 2026-03-02]";
         }
 
         setTimeout(() => {
@@ -95,14 +103,12 @@
 
     function speak(text) {
         isSpeaking = true;
-        recognition.stop();
-        status.innerText = "JARVIS SPEAKING...";
+        window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'hi-IN';
         utterance.onend = () => {
             isSpeaking = false;
-            recognition.start();
-            status.innerText = "SENSORS: STANDBY (WAITING FOR 'HELLO JARVIS')";
+            status.innerText = "LISTENING FOR 'HELLO JARVIS'...";
         };
         window.speechSynthesis.speak(utterance);
     }
@@ -113,6 +119,14 @@
         div.innerText = text;
         chatWindow.appendChild(div);
         chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function manualChat() {
+        const input = document.getElementById('userInput');
+        if (input.value) {
+            process(input.value);
+            input.value = '';
+        }
     }
 </script>
 </body>
