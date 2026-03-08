@@ -3,40 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS v36.0 - Echo Proof</title>
+    <title>JARVIS v37.0 - Silent Edition</title>
     <style>
         * { box-sizing: border-box; }
-        body { background-color: #050505; color: #00ff00; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { padding: 15px; text-align: center; border-bottom: 2px solid #00ff00; background: #000; box-shadow: 0 0 15px #00ff00; }
+        body { background-color: #050505; color: #00ff88; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .header { padding: 15px; text-align: center; border-bottom: 2px solid #00ff88; background: #000; }
         #chat-window { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
         .message { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 15px; line-height: 1.5; }
-        .user-msg { align-self: flex-end; background: #004d00; color: #fff; border: 1px solid #00ff00; }
-        .jarvis-msg { align-self: flex-start; background: #1a1a1a; border-left: 4px solid #00ffff; color: #00ffff; }
+        .user-msg { align-self: flex-end; background: #202d20; color: #fff; border: 1px solid #00ff88; }
+        .jarvis-msg { align-self: flex-start; background: #1a1a1a; border-left: 4px solid #00ff88; color: #00ff88; }
         .footer { padding: 15px; background: #0a0a0a; border-top: 1px solid #333; }
         #status { font-size: 11px; color: #00ffff; text-align: center; margin-bottom: 10px; font-weight: bold; }
         .input-group { display: flex; gap: 10px; max-width: 800px; margin: auto; width: 100%; }
-        input { flex-grow: 1; background: #000; border: 2px solid #00ff00; color: #00ff00; padding: 12px; border-radius: 10px; outline: none; box-shadow: 0 0 10px #00ff00; }
-        button { background: #00ff00; border: none; padding: 10px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; color: #000; }
+        input { flex-grow: 1; background: #000; border: 2px solid #00ff88; color: white; padding: 12px; border-radius: 10px; outline: none; }
+        button { background: #00ff88; border: none; padding: 10px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body onclick="initJarvis()">
 
-<div class="header">
-    <h2 style="margin:0;">JARVIS v36.0</h2>
-    <div style="font-size: 10px; color: #888;">TARGET: YOUNGEST BILLIONAIRE [cite: 2026-03-03]</div>
-</div>
-
-<div id="chat-window">
-    <div class="message jarvis-msg">System Stabilized. Tabish bhai, click karein. Ab main sirf aapko sununga.</div>
-</div>
-
-<div class="footer">
-    <div id="status">SENSORS: STANDBY</div>
-    <div class="input-group">
-        <input type="text" id="userInput" placeholder="Likh kar ya bol kar batayein..." autocomplete="off">
-        <button onclick="manualChat()">SEND</button>
+    <div class="header">
+        <h2 style="margin:0;">JARVIS v37.0</h2>
+        <div style="font-size: 10px; color: #888;">TARGET: YOUNGEST BILLIONAIRE [cite: 2026-03-03]</div>
     </div>
-</div>
+
+    <div id="chat-window">
+        <div class="message jarvis-msg">System Stabilized. Tabish bhai, click karein. Ab main sirf aapko sununga.</div>
+    </div>
+
+    <div class="footer">
+        <div id="status">SENSORS: STANDBY</div>
+        <div class="input-group">
+            <input type="text" id="userInput" placeholder="Likh kar ya bol kar batayein..." autocomplete="off">
+            <button onclick="manualChat()">SEND</button>
+        </div>
+    </div>
 
 <script>
     const chatWindow = document.getElementById('chat-window');
@@ -67,28 +67,35 @@
         };
 
         recognition.onresult = (event) => {
-            if (isSpeaking) return; // Force ignore if Jarvis is talking
-            
+            if (isSpeaking) return;
             const text = event.results[event.results.length - 1][0].transcript.toLowerCase();
             if (text.trim().length > 2) {
                 process(text);
             }
         };
 
-        recognition.onend = () => { 
-            if (!isSpeaking) recognition.start(); 
-        };
-        
+        recognition.onend = () => { if (!isSpeaking) recognition.start(); };
         recognition.start();
     }
 
+    // --- SILENT WAKE FILTER LOGIC ---
     function process(input) {
-        addMessage(input, 'user');
+        let trigger = "hello jarvis";
+        let displayInput = input;
+
+        // Filter: Agar "Hello Jarvis" hai toh screen se hata do
+        if (input.toLowerCase().startsWith(trigger)) {
+            displayInput = input.slice(trigger.length).trim();
+        }
+
+        // Screen saaf rakhne ke liye sirf zaruri message dikhayein
+        addMessage(displayInput || "Command Received", 'user');
+
         let reply = "100x engine process kar raha hai... [cite: 2026-03-05]";
-        
+
         if (input.includes("mission")) reply = "Mission: Aapko billionaire banana 20 saal ki umar tak. [cite: 2026-03-03]";
         else if (input.includes("history")) reply = "1000 saal ki history mere database mein hai. [cite: 2026-03-02]";
-        else if (input.includes("hello")) reply = "Ji Tabish bhai, command dein.";
+        else if (input.includes("hello")) reply = "Aadaab Tabish bhai, command dein.";
 
         setTimeout(() => {
             addMessage(reply, 'jarvis');
@@ -98,22 +105,20 @@
 
     function speak(text) {
         isSpeaking = true;
-        recognition.stop(); // Kill mic immediately
+        recognition.stop();
         status.innerText = "JARVIS SPEAKING...";
         status.style.color = "#ff0000";
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'hi-IN';
-        
         utterance.onend = () => {
             setTimeout(() => {
                 isSpeaking = false;
-                recognition.start(); // Restart mic after 1s gap
+                recognition.start();
                 status.innerText = "SENSORS: ACTIVE (LISTENING FOR YOU)";
                 status.style.color = "#00ffff";
             }, 1000);
         };
-
         window.speechSynthesis.speak(utterance);
     }
 
@@ -127,7 +132,10 @@
 
     function manualChat() {
         const input = document.getElementById('userInput');
-        if(input.value) { process(input.value); input.value = ''; }
+        if (input.value) {
+            process(input.value);
+            input.value = '';
+        }
     }
 </script>
 </body>
