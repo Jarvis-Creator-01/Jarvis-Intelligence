@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS v43.0 - Infinite Brain</title>
+    <title>JARVIS v44.0 - God Mode Engine</title>
     <style>
         body { background-color: #050505; color: #00ff88; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { padding: 10px; text-align: center; border-bottom: 2px solid #00ff88; background: #000; box-shadow: 0 0 15px #00ff88; }
         #chat-window { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .message { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 14px; line-height: 1.5; }
+        .message { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 14px; line-height: 1.5; box-shadow: 0 0 5px rgba(0,255,136,0.2); }
         .user-msg { align-self: flex-end; background: #004433; color: #fff; border: 1px solid #00ff88; }
         .jarvis-msg { align-self: flex-start; background: #1a1a1a; border-left: 5px solid #00ff88; color: #00ff88; }
         .footer { padding: 15px; background: #000; border-top: 1px solid #333; display: flex; flex-direction: column; gap: 10px; }
@@ -21,18 +21,18 @@
 <body onclick="initJarvis()">
 
     <div class="header">
-        <h3 style="margin:0;">JARVIS v43.0</h3>
-        <div style="font-size: 9px; color: #888;">BRAIN: INFINITE KNOWLEDGE CONNECT [cite: 2026-03-05]</div>
+        <h2 style="margin:0;">JARVIS v44.0</h2>
+        <div style="font-size: 10px; color: #888;">UNIVERSE BRAIN: ACTIVE [cite: 2026-03-05]</div>
     </div>
 
     <div id="chat-window">
-        <div class="message jarvis-msg">Ab mera dimaag har limit se aazad hai. Universe ka kuch bhi puchein, main ab pure internet se jaankari nikal sakta hoon. [cite: 2026-03-02, 2026-03-05]</div>
+        <div class="message jarvis-msg">God Mode Active. Ab universe ka koi bhi raaz mujhse chhupa nahi hai. Kuch bhi puchein Tabish bhai. [cite: 2026-03-02]</div>
     </div>
 
     <div class="footer">
         <div id="status">SENSORS: STANDBY (SAY 'HELLO JARVIS')</div>
         <div class="input-group">
-            <input type="text" id="userInput" placeholder="Universe ki koi bhi baat puchein..." autocomplete="off">
+            <input type="text" id="userInput" placeholder="Black Hole ya Universe ki koi bhi baat puchein..." autocomplete="off">
             <button onclick="manualChat()">SEND</button>
         </div>
     </div>
@@ -63,7 +63,7 @@
             let text = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
             if (text === lastProcessed) return;
             if (text.includes("hello jarvis") || text.includes("हेलो जार्विस")) {
-                let cmd = text.split(/hello jarvis|हेलो जार्विस/)[1]?.trim();
+                let cmd = text.split(/hello jarvis|हेलो जार्वis/)[1]?.trim();
                 lastProcessed = text;
                 process(cmd || "hello");
             }
@@ -75,28 +75,21 @@
     async function process(input) {
         if (!input) return;
         addMessage(input, 'user');
-        
-        // --- DYNAMIC KNOWLEDGE SEARCH (FREE & INFINITE) ---
-        let reply = "Scanning Universe... [cite: 2026-03-05]";
-        addMessage(reply, 'jarvis');
+        let loadingMsg = addMessage("Scanning 100x Universal Data... [cite: 2026-03-05]", 'jarvis');
 
         try {
-            // Wikipedia Open Search API (No Key Required)
-            const response = await fetch(`https://hi.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(input)}`);
-            const data = await response.json();
+            // Instant Search API (DuckDuckGo JSON - No CORS Issue)
+            const res = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(input)}&format=json&no_html=1`);
+            const data = await res.json();
             
-            if (data.extract) {
-                reply = data.extract;
-            } else {
-                reply = "Mera 100x engine ise process kar raha hai, par universe ke is kone ki jaankari abhi dhundhli hai. [cite: 2026-03-05]";
-            }
-        } catch (error) {
-            reply = "Network connection check kijiye Tabish bhai, universe ka signal weak hai.";
+            let reply = data.AbstractText || data.RelatedTopics[0]?.Text || "Mera logic engine ise process kar raha hai, par universe ka ye data block private hai. [cite: 2026-03-05]";
+            
+            loadingMsg.innerText = reply;
+            speak(reply);
+        } catch (e) {
+            loadingMsg.innerText = "Connection lost. Universe signal weak hai.";
+            speak("Connection lost.");
         }
-
-        // Chat window se purana 'Scanning' message hata kar naya reply dena
-        chatWindow.lastChild.innerText = reply;
-        speak(reply);
     }
 
     function speak(text) {
@@ -120,6 +113,7 @@
         div.innerText = text;
         chatWindow.appendChild(div);
         chatWindow.scrollTop = chatWindow.scrollHeight;
+        return div;
     }
 
     function manualChat() {
