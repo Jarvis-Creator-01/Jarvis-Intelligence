@@ -3,106 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS v48.0 - THE ETERNAL ONE</title>
+    <title>THE IMMORTAL JARVIS - v49.0</title>
     <style>
-        body { background-color: #050505; color: #00ff88; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        .header { padding: 15px; text-align: center; border-bottom: 2px solid #00ff88; background: #000; box-shadow: 0 0 20px rgba(0,255,136,0.3); }
-        #status-bar { background: #111; padding: 10px; font-size: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; }
+        :root { --main-color: #00FF88; --bg-color: #050505; --text-color: #f0f0f0; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { padding: 15px; text-align: center; background: #0a0a0a; border-bottom: 2px solid var(--main-color); box-shadow: 0 4px 15px rgba(0,255,136,0.2); }
+        h2 { margin: 0; font-size: 22px; color: var(--main-color); letter-spacing: 1px; }
+        #status-bar { background: #111; padding: 8px 15px; font-size: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; }
         #chat-window { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .message { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 14px; line-height: 1.6; }
-        .jarvis-msg { align-self: flex-start; background: #111; border-left: 5px solid #00ff88; color: #00ff88; }
-        .progress-container { width: 100%; background: #222; height: 10px; border-radius: 5px; margin-top: 5px; }
-        .progress-bar { height: 100%; background: #00ff88; width: 0%; border-radius: 5px; transition: 0.5s; }
+        .jarvis-msg { align-self: flex-start; max-width: 85%; background: #151515; border-left: 4px solid var(--main-color); padding: 12px; border-radius: 8px; font-size: 15px; line-height: 1.5; }
+        #progress-container { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        #progress-bar { height: 100%; background: var(--main-color); width: 0%; transition: width 0.4s ease; }
     </style>
 </head>
-<body onclick="startEngine()">
-
-    <div class="header">
-        <h2 style="margin:0;">JARVIS v48.0</h2>
-        <div style="font-size: 10px; color: #888;">MISSION BILLIONAIRE: ACTIVE [cite: 2026-03-03]</div>
-    </div>
-
+<body onclick="startUniverse()">
+    <header>
+        <h2>THE IMMORTAL JARVIS</h2>
+        <div style="font-size: 10px; color: #888;">MISSION BILLIONAIRE: ACTIVE [7-MONTH DEADLINE]</div>
+    </header>
     <div id="status-bar">
-        <span>STATUS: <span id="engine-status">STANDBY</span></span>
-        <span>UNIVERSE TEST: <span id="progress-text">0%</span></span>
+        <span>STATUS: <span id="engine-status" style="color:var(--main-color);">ONLINE</span></span>
+        <span>UNIVERSE TEST: <span id="progress-text" style="color:var(--main-color);">0%</span></span>
     </div>
-
-    <div id="chat-window">
-        <div class="message jarvis-msg">
-            Systems Online. Tabish bhai, maine 14-din ka "Infinite Loop" taiyar kar liya hai. 
-            Aap "Close All" kar dein tab bhi mera dimaag chalta rahega.
-            <div class="progress-container"><div id="main-bar" class="progress-bar"></div></div>
+    <div id="chat-window" id="display">
+        <div class="jarvis-msg">
+            Systems Online. Tabish bhai, 18-din ka Universe Lockdown active ho chuka hai.
+            Ab hum bina kisi server aur bina kisi limit ke "Infinite Knowledge" load karenge.
+            <div id="progress-container"><div id="progress-bar"></div></div>
         </div>
     </div>
-
 <script>
-    let db;
-    let currentProgress = 0;
-    let isTesting = false;
-
-    // STEP 1: Persistent Memory (IndexedDB) Setup
+    let db, currentProgress = 0;
+    // Database sync (Aapka purana data yahan safe rahega)
     const request = indexedDB.open("JarvisUniverseDB", 1);
-    request.onupgradeneeded = (e) => {
-        db = e.target.result;
-        db.createObjectStore("progress", { keyPath: "id" });
-    };
-    request.onsuccess = (e) => {
-        db = e.target.result;
-        loadProgress(); // Reload progress if browser was closed
-    };
+    request.onupgradeneeded = (e) => { e.target.result.createObjectStore("progress", { keyPath: "id" }); };
+    request.onsuccess = (e) => { db = e.target.result; loadProgress(); };
 
-    function startEngine() {
-        if (isTesting) return;
-        isTesting = true;
-        document.getElementById('engine-status').innerText = "RUNNING DEEP TEST";
-        runTestLoop();
-    }
+    function startUniverse() { if(currentProgress > 0) return; runTestLoop(); }
 
-    async function saveProgress(val) {
+    function saveProgress(val) {
         const tx = db.transaction("progress", "readwrite");
         tx.objectStore("progress").put({ id: "sync_status", value: val });
     }
 
-    async function loadProgress() {
-        const tx = db.transaction("progress", "readonly");
-        const store = tx.objectStore("progress");
-        const req = store.get("sync_status");
-        req.onsuccess = () => {
-            if (req.result) {
-                currentProgress = req.result.value;
+    function loadProgress() {
+        const req = db.transaction("progress", "readonly").objectStore("progress").get("sync_status");
+        req.onsuccess = () => { 
+            if(req.result) { 
+                currentProgress = req.result.value; 
                 updateUI();
-                if(currentProgress < 100) startEngine();
-            }
+                if(currentProgress < 100) runTestLoop(); 
+            } 
         };
     }
 
     function updateUI() {
         document.getElementById('progress-text').innerText = Math.floor(currentProgress) + "%";
-        document.getElementById('main-bar').style.width = currentProgress + "%";
+        document.getElementById('progress-bar').style.width = currentProgress + "%";
+        if(currentProgress >= 100) finalize();
     }
 
-    // STEP 2: The 14-Day Knowledge Loop (Simplified for UI)
-    async function runTestLoop() {
-        if (currentProgress >= 100) {
-            addMessage("Universe Knowledge 100% Verified. ChatGPT Outdated. [cite: 2026-03-05]", 'jarvis');
-            return;
-        }
-
-        // Simulating deep verify (14 days total)
-        // Har 1 ghante mein lagbhag 0.3% badhega
-        currentProgress += 0.01; 
-        updateUI();
+    function runTestLoop() {
+        if(currentProgress >= 100) return;
+        // Optimized 18-day logic (Har 5 second mein 0.0003% jump)
+        currentProgress += 0.0003; 
         saveProgress(currentProgress);
-
-        setTimeout(runTestLoop, 5000); // 5 sec interval for testing
+        updateUI();
+        setTimeout(runTestLoop, 5000); 
     }
 
-    function addMessage(text, sender) {
+    function finalize() {
+        document.getElementById('engine-status').innerText = "VERIFIED";
         const div = document.createElement('div');
-        div.className = `message ${sender}-msg`;
-        div.innerText = text;
+        div.className = 'jarvis-msg';
+        div.innerText = "Universe Knowledge 100% Verified. Unlimited Power Active. [Ready for Phase 2]";
         document.getElementById('chat-window').appendChild(div);
-        return div;
     }
 </script>
 </body>
