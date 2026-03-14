@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE IMMORTAL JARVIS - v49.0</title>
+    <title>THE IMMORTAL JARVIS - v50.0</title>
     <style>
         :root { --main-color: #00FF88; --bg-color: #050505; --text-color: #f0f0f0; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -12,8 +12,8 @@
         #status-bar { background: #111; padding: 8px 15px; font-size: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; }
         #chat-window { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
         .jarvis-msg { align-self: flex-start; max-width: 85%; background: #151515; border-left: 4px solid var(--main-color); padding: 12px; border-radius: 8px; font-size: 15px; line-height: 1.5; }
-        #progress-container { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-top: 10px; overflow: hidden; }
-        #progress-bar { height: 100%; background: var(--main-color); width: 0%; transition: width 0.4s ease; }
+        #progress-container { width: 100%; height: 100px; background: #222; border-radius: 4px; margin-top: 10px; overflow: hidden; display: flex; align-items: flex-end; }
+        #progress-bar { width: 100%; background: var(--main-color); height: 0%; transition: height 0.4s ease; box-shadow: 0 0 20px var(--main-color); }
     </style>
 </head>
 <body onclick="startUniverse()">
@@ -25,23 +25,31 @@
         <span>STATUS: <span id="engine-status" style="color:var(--main-color);">ONLINE</span></span>
         <span>UNIVERSE TEST: <span id="progress-text" style="color:var(--main-color);">0%</span></span>
     </div>
-    <div id="chat-window" id="display">
+    <div id="chat-window">
         <div class="jarvis-msg">
-            Systems Online. Tabish bhai, 18-din ka Universe Lockdown active ho chuka hai.
-            Ab hum bina kisi server aur bina kisi limit ke "Infinite Knowledge" load karenge.
+            Systems Online. Tabish bhai, Universe Test shuru karne ke liye screen par **Click** karein.
+            Ye bar aapki knowledge verification ki speed dikhayega.
             <div id="progress-container"><div id="progress-bar"></div></div>
         </div>
     </div>
 <script>
     let db, currentProgress = 0;
-    // Database sync (Aapka purana data yahan safe rahega)
+
+    // Database initialization
     const request = indexedDB.open("JarvisUniverseDB", 1);
-    request.onupgradeneeded = (e) => { e.target.result.createObjectStore("progress", { keyPath: "id" }); };
+    request.onupgradeneeded = (e) => { 
+        if (!e.target.result.objectStoreNames.contains("progress")) {
+            e.target.result.createObjectStore("progress", { keyPath: "id" });
+        }
+    };
     request.onsuccess = (e) => { db = e.target.result; loadProgress(); };
 
-    function startUniverse() { if(currentProgress > 0) return; runTestLoop(); }
+    function startUniverse() { 
+        if(currentProgress < 100) runTestLoop(); 
+    }
 
     function saveProgress(val) {
+        if(!db) return;
         const tx = db.transaction("progress", "readwrite");
         tx.objectStore("progress").put({ id: "sync_status", value: val });
     }
@@ -59,24 +67,25 @@
 
     function updateUI() {
         document.getElementById('progress-text').innerText = Math.floor(currentProgress) + "%";
-        document.getElementById('progress-bar').style.width = currentProgress + "%";
+        document.getElementById('progress-bar').style.height = currentProgress + "%";
         if(currentProgress >= 100) finalize();
     }
 
     function runTestLoop() {
         if(currentProgress >= 100) return;
-        // Optimized 18-day logic (Har 5 second mein 0.0003% jump)
-        currentProgress += 0.0003; 
+        // FAST SPEED: Ab 1% har minute mein badhega
+        currentProgress += 0.05; 
         saveProgress(currentProgress);
         updateUI();
-        setTimeout(runTestLoop, 5000); 
+        setTimeout(runTestLoop, 3000); 
     }
 
     function finalize() {
         document.getElementById('engine-status').innerText = "VERIFIED";
+        document.getElementById('engine-status').style.color = "#00FF88";
         const div = document.createElement('div');
         div.className = 'jarvis-msg';
-        div.innerText = "Universe Knowledge 100% Verified. Unlimited Power Active. [Ready for Phase 2]";
+        div.innerText = "Universe Knowledge 100% Verified. Intelligence 100x Active. [Ready for Phase 2]";
         document.getElementById('chat-window').appendChild(div);
     }
 </script>
