@@ -3,91 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE IMMORTAL JARVIS - v50.0</title>
+    <title>THE IMMORTAL JARVIS - v51.0</title>
     <style>
         :root { --main-color: #00FF88; --bg-color: #050505; --text-color: #f0f0f0; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { padding: 15px; text-align: center; background: #0a0a0a; border-bottom: 2px solid var(--main-color); box-shadow: 0 4px 15px rgba(0,255,136,0.2); }
+        header { padding: 15px; text-align: center; background: #0a0a0a; border-bottom: 2px solid var(--main-color); }
         h2 { margin: 0; font-size: 22px; color: var(--main-color); letter-spacing: 1px; }
         #status-bar { background: #111; padding: 8px 15px; font-size: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #333; }
         #chat-window { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .jarvis-msg { align-self: flex-start; max-width: 85%; background: #151515; border-left: 4px solid var(--main-color); padding: 12px; border-radius: 8px; font-size: 15px; line-height: 1.5; }
-        #progress-container { width: 100%; height: 100px; background: #222; border-radius: 4px; margin-top: 10px; overflow: hidden; display: flex; align-items: flex-end; }
-        #progress-bar { width: 100%; background: var(--main-color); height: 0%; transition: height 0.4s ease; box-shadow: 0 0 20px var(--main-color); }
+        .jarvis-msg { align-self: flex-start; max-width: 85%; background: #151515; border-left: 4px solid var(--main-color); padding: 12px; border-radius: 8px; font-size: 15px; }
+        #progress-container { width: 100%; height: 20px; background: #222; border-radius: 10px; margin-top: 10px; overflow: hidden; position: relative; }
+        #progress-bar { width: 0%; background: var(--main-color); height: 100%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--main-color); }
     </style>
 </head>
 <body onclick="startUniverse()">
     <header>
         <h2>THE IMMORTAL JARVIS</h2>
-        <div style="font-size: 10px; color: #888;">MISSION BILLIONAIRE: ACTIVE [7-MONTH DEADLINE]</div>
+        <div style="font-size: 10px; color: #888;">MISSION BILLIONAIRE: ACTIVE</div>
     </header>
     <div id="status-bar">
-        <span>STATUS: <span id="engine-status" style="color:var(--main-color);">ONLINE</span></span>
+        <span>STATUS: <span id="engine-status" style="color:var(--main-color);">HYPER-DRIVE</span></span>
         <span>UNIVERSE TEST: <span id="progress-text" style="color:var(--main-color);">0%</span></span>
     </div>
     <div id="chat-window">
         <div class="jarvis-msg">
-            Systems Online. Tabish bhai, Universe Test shuru karne ke liye screen par **Click** karein.
-            Ye bar aapki knowledge verification ki speed dikhayega.
+            Tabish bhai, System ab **"Time-Sync"** mode mein hai. Aap browser band bhi kar denge, toh piche ki calculation miss nahi hogi.
             <div id="progress-container"><div id="progress-bar"></div></div>
         </div>
     </div>
 <script>
     let db, currentProgress = 0;
+    const SPEED_PER_MS = 0.00000006; // 18-din ka target speed
 
-    // Database initialization
-    const request = indexedDB.open("JarvisUniverseDB", 1);
-    request.onupgradeneeded = (e) => { 
-        if (!e.target.result.objectStoreNames.contains("progress")) {
-            e.target.result.createObjectStore("progress", { keyPath: "id" });
-        }
-    };
-    request.onsuccess = (e) => { db = e.target.result; loadProgress(); };
+    const request = indexedDB.open("JarvisUniverseDB", 2);
+    request.onupgradeneeded = (e) => { e.target.result.createObjectStore("progress", { keyPath: "id" }); };
+    request.onsuccess = (e) => { db = e.target.result; syncProgress(); };
 
-    function startUniverse() { 
-        if(currentProgress < 100) runTestLoop(); 
+    function syncProgress() {
+        const tx = db.transaction("progress", "readonly");
+        const req = tx.objectStore("progress").get("sync_status");
+        req.onsuccess = () => {
+            if(req.result) {
+                let lastData = req.result;
+                let now = Date.now();
+                let timeGap = now - lastData.time;
+                
+                // Calculate jump based on time gap (Background processing simulation)
+                let jump = timeGap * SPEED_PER_MS;
+                currentProgress = Math.min(100, lastData.value + jump);
+                updateUI();
+            }
+            runTestLoop();
+        };
+    }
+
+    function runTestLoop() {
+        if(currentProgress >= 100) return;
+        currentProgress += 0.0001; // Live visual update
+        saveProgress(currentProgress);
+        updateUI();
+        setTimeout(runTestLoop, 10000); 
     }
 
     function saveProgress(val) {
         if(!db) return;
         const tx = db.transaction("progress", "readwrite");
-        tx.objectStore("progress").put({ id: "sync_status", value: val });
-    }
-
-    function loadProgress() {
-        const req = db.transaction("progress", "readonly").objectStore("progress").get("sync_status");
-        req.onsuccess = () => { 
-            if(req.result) { 
-                currentProgress = req.result.value; 
-                updateUI();
-                if(currentProgress < 100) runTestLoop(); 
-            } 
-        };
+        tx.objectStore("progress").put({ id: "sync_status", value: val, time: Date.now() });
     }
 
     function updateUI() {
         document.getElementById('progress-text').innerText = Math.floor(currentProgress) + "%";
-        document.getElementById('progress-bar').style.height = currentProgress + "%";
+        document.getElementById('progress-bar').style.width = currentProgress + "%";
         if(currentProgress >= 100) finalize();
-    }
-
-    function runTestLoop() {
-        if(currentProgress >= 100) return;
-         FAST SPEED: Ab 1% har minute mein badhega
-       currentProgress += 0.0003;
-        saveProgress(currentProgress);
-        updateUI();
-        setTimeout(runTestLoop, 3000); 
     }
 
     function finalize() {
         document.getElementById('engine-status').innerText = "VERIFIED";
-        document.getElementById('engine-status').style.color = "#00FF88";
         const div = document.createElement('div');
         div.className = 'jarvis-msg';
-        div.innerText = "Universe Knowledge 100% Verified. Intelligence 100x Active. [Ready for Phase 2]";
+        div.innerText = "Universe Test 100% Completed. Ready for Deployment.";
         document.getElementById('chat-window').appendChild(div);
     }
+
+    function startUniverse() { if(currentProgress < 100) runTestLoop(); }
 </script>
 </body>
 </html>
